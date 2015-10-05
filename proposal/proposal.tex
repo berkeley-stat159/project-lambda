@@ -38,17 +38,27 @@ effect of visual imagery.  In addition, this dataset uses inter-individual
 synchronicity to study responses to complex processing.  This paper explains
 the preparation of the dataset, such as collecting physiological information
 then accounting for it in the voxels, and an initial analysis.  Hanke et al.
-used representational similarity anallysis to identify similar patterns
+used representational similarity analysis to identify similar patterns
 across brains.  They created a representationaly consistency map using pairwise
 correlations.  After thresholding, the map revealed two clusters in the PT,
 which is known to be used for auditory cognition.
-could be used to study common response
 
-Briefly explain what approach you intend to take for exploring
-the data and paper.  If you intend to ``reproduce'' some aspect of the paper,
-explain in exactly what sense you mean to do this.  If you are thinking about
-validating the data describe the assumpution used in the analysis and indicate
-how you might check them.
+The main purpose of this experiment was to study properties of brain response
+patterns that are supposedly common when people are exposed to audio and movie
+simulation. We intend to replicate their experiment using the data they gathered
+from the 20 participants. For example, a BOLD time-series similarity measure
+(e.g. correlation) is often used to quantify similarities in responses among
+individuals. Hank et al. recognized that this was a common approach, but they
+went beyond that and also implemented representational similarity analysis (RSA).
+To do so, we will create dissimilarity matrices for 18 individuals using the same
+searchlight mapping approach that they used (Subjects 4 and 10 were not included
+due to missing data). Doing so will capture 2nd-order isomorphisms in response
+patterns. Lastly, to access statistical significance, we will transform the
+representational consistency map into percent rank with respect to the total
+distribution of the DSM correlations. We'll calculate the mean correlation
+coefficient and compare our value to theirs.
+
+
 
 \bibliography{project}
 
