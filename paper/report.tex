@@ -2,40 +2,84 @@
 
 \usepackage[margin=0.75in]{geometry}
 
-\title{The title of your project proposal}
+\title{fMRI Dataset from Complex Natural Simulation with Forrest Gump: A Restudy}
 \author{
-  LastName1, FirstName1\\
-  \texttt{github1}
+  Chang, Jordeen\\
+  \texttt{jodreen}
   \and
-  LastName2, FirstName2\\
-  \texttt{github2}
+  Daks, Alon\\
+  \texttt{AlonDaks}
   \and
-  LastName3, FirstName3\\
-  \texttt{github3}
+  Luo, Ying\\
+  \texttt{yingtluo}
   \and
-  LastName4, FirstName4\\
-  \texttt{github4}
+  Yu, Lisa Ann\\
+  \texttt{lisaannyu}
 }
 
 \bibliographystyle{siam}
 
 \begin{document}
-\maketitle
+\maketitle  
 
-\abstract{You should have a short abstract.}
+\abstract{Most fMRI studies use highly simplified stimulus that are vastly dissimilar
+from what people experience in everyday life. This study sought to create
+a dataset of naturally occurring brain states by exposing participants
+to a more complex stimulus, the audio description of Forrest Gump. This particular
+audio description allows for the study of auditory attention and cognition, 
+language and music perception, and retrieval of explicit memory without the
+effect of visual imagery. In addition, this dataset uses inter-individual 
+synchronicity to study responses to complex processing. Originally,
+representational similarity analysis was used to identify similar patterns
+across brains.}
 
 \section{Introduction}
 
-Identify a published fMRI paper and the accompanying data
-\cite{lindquist2008statistical}.  You should explain the basic idea of the
-paper in a paragraph.  You should also perform basic sanity check on the data
-(e.g., can you downloaded, can you load the files, confirm that you have the
-correct number of subjects).
+The main purpose of the original study was to study properties of brain response
+patterns that are supposedly common when people are exposed to audio and movie
+simulation. We intend to replicate their experiment using the data they gathered
+from the 20 participants. For example, a BOLD time-series similarity measure
+(e.g. correlation) is often used to quantify similarities in responses among
+individuals. Hank et al. recognized that this was a common approach, but they
+went beyond that and also implemented representational similarity analysis 
+(RSA). To do so, we will create dissimilarity matrices for 18 individuals using
+the same searchlight mapping approach that they used (Subjects 4 and 10 were not
+included due to missing data). Doing so will capture 2nd-order isomorphisms in
+response patterns. Lastly, to access statistical significance, we will transform
+the representational consistency map into percent rank with respect to the total
+distribution of the DSM correlations. We'll calculate the mean correlation
+coefficient and compare our value to theirs.
 
-Briefly explain what reproducibility means and in what sense you will
-try to reproduce this study.
+Before we formally began, we performed basic sanity checks on the data. We
+have downloaded and loaded the files successfully, and we have confirmed that
+we have data from all subjects. Reproducibility is crucial in research, especially
+when such high volumes of data are involved, because it allows other people to
+fact check the work. When people collaborate, new insights can be shed and the
+rate of progress is expedited. For this study, we will begin by following the 
+exact steps Hanke and his team took. Along the way, when we have identified areas
+that they did not have time to thoroughly research, we will then delve deeper in
+an effort to shed more insights.
+
+Identify a published fMRI paper and the accompanying data
+\cite{lindquist2008statistical}.
 
 \section{Data}
+The data is curated and segmented into 20 .TGZ files, where each of the 20 .TGZ 
+files corresponds to one of the 20 subjects in the experiment. Each subject 
+accounts for approximately 16 GBs of data. We verified the usability of the data
+by inspecting and loading data corresponding to subject 1. We limited our 
+initial exploration to a single subject since downloading each .TGZ takes 
+approximately one hour. To ensure speedy access to the overall dataset when we 
+begin central project work, our strategy for getting all the data entails each 
+group member spending five hours downloading a different quarter of the overall
+dataset, and then locally transferring the remaining three-quarters of the data
+from our harddrives. Each subject's data includes several formats: subject
+metadata(CSV), Raw BOLD functional MRI, Raw BOLD functional MRI 
+(with applied distortion correction), Raw BOLD functional MRI (linear anatomical
+alignment), Raw BOLD functional MRI (non-linear anatomical alignment), along 
+with several Structural MRI datasets. The corrected and aligned versions of the
+data attempt to eliminate device and scan related noise. Scan data is 
+accessible in nibabel compatible formats (.NII).
 
 \section{Methods}
 \section{Results}
