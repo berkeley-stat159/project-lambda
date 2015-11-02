@@ -75,7 +75,6 @@ def pearson_2d(x, Y):
     # b : Get sum of products of mc_x on mc_x
     b = mc_x.dot(mc_x)
     # c : Get sum of products of every column of mc_Y[:, i] on itself
-    c = np.sum(mc_Y ** 2, axis=0)
+    c = np.sum(mc_Y**2, axis=0)
     # return a / (sqrt(b) * sqrt(c))
     return a / (np.sqrt(b) * np.sqrt(c))
-
