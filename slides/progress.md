@@ -25,7 +25,7 @@
 ## EDA
 
 - downloaded data
-- simple plots, summary statistics
+- simple plots, summary statistics across participants
 
 # Next steps
 
