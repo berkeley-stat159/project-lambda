@@ -1,0 +1,23 @@
+Our project dataset requires downloading 20 .TGZ files, one per subject. Each 
+.TGZ is 16 GBs. This file outlines how we plan on downloaded the data since that
+itself is not trivial.
+
+Each team member is tasked to download data for five subjects. Each subject
+takes about 1.5 hours to download. Team members will place their downloaded 
+.TGZs on an external hard-drive. Then, team members will meet in person to 
+transfer .TGZs among each other. Each transfer takes less than 10 minutes, which
+reduces the total download time from ~30 hours to ~10 hours. 
+
+Once we everyone has all the data, we will unpack the .TGZs and see precisely 
+which files we are going to use for our analysis. Keeping only the files we 
+intend to use, we will upload the data to Google Drive. We will then write 
+appropriate download scripts interfacing with the Google Drive data repository.
+
+Below outlines which team member is responsible for downloading each subject's
+.TGZ:
+
+Alon: Subjects 1-5
+Lisa: Subjects 6-10
+Ying: Subjects 11-15
+Jordeen: Subjects 16-20
+
