@@ -8,7 +8,7 @@ takes about 1.5 hours to download. Team members will place their downloaded
 transfer .TGZs among each other. Each transfer takes less than 10 minutes, which
 reduces the total download time from ~30 hours to ~10 hours.
 
-Once we everyone has all the data, we will unpack the .TGZs and see precisely
+Once everyone has all the data, we will unpack the .TGZs and see precisely
 which files we are going to use for our analysis. Keeping only the files we
 intend to use, we will upload the data to Google Drive. We will then write
 appropriate download scripts interfacing with the Google Drive data repository.
@@ -41,4 +41,15 @@ are
 
 Upon expanding the .gz files, there is approximately 8 GBs worth of data
 for each subject, thus reducing the size by half. It's still quite a lot.
+
+-------------UPDATE-------------------
+
+After talking to Jarrod we have decided that we don't need to work with
+all subjects right now since our goal is not to actually generate a scientific
+claim. Our focus will be to extrapolate as much as we can from the data, and
+experiment with different techniques of analyzing data to find something
+interesting. Thus we will be working with only subject one, and if time
+permits, we can apply our code to other subjects as well to do comparisons.
+
+
 
