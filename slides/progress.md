@@ -22,7 +22,7 @@
 
 # Initial work
 
-## EDA
+## Exploratory Data Analysis
 
 - downloaded data
 - simple plots, summary statistics across participants
