@@ -1,6 +1,6 @@
-# data-storage
+# data
 
-This directory should contain data_path.py. data_path.py is ignored by git and 
-should not be checked into the repository.
+If the path to your data on your computer is `/Volumes/Passport/fmri_data`, then you can
+create a symbolic link via:
 
-data_path.py should contain a variable called DATA_PATH = "\<path_to_your_local_data\>"
+    $ ln -s /Volumes/Passport/fmri_data raw
