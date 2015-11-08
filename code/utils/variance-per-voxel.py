@@ -1,15 +1,6 @@
-# If you want to show figures inside iPython notebook
-# %matplotlib inline
-
-# Importing modules and tools
 import numpy as np 
 import matplotlib.pyplot as plt 
 import nibabel as nib
-
-# import sys
-# Appending directoy to sys.path
-#sys.path.append('/Users/ying/Stat159/data/sub001/BOLD/task001_run001')
-# fname = bold_dico_dico7Tad2grpbold7Tad.nii
 
 def load_image(fname):
 	"""
@@ -25,7 +16,7 @@ def load_image(fname):
 	data : a 4-D array
 	"""
 	img = nib.load(fname)
-	data = img.get_data() # data.shape yields (132, 175,  48, 451)
+	data = img.get_data()
 	return data
 
 
@@ -167,5 +158,4 @@ def plot_var(data):
 		variances.append(np.var(vol))
 	plt.plot(variances)
 	return variances
-
 
