@@ -3,3 +3,6 @@ data:
 
 validate:
 	python data.py
+
+README.pdf: README.md
+	pandoc -o README.pdf README.md
