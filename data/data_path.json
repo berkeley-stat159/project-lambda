@@ -1,0 +1,14 @@
+{
+	"bold_dico_7Tad2grpbold7Tad": {
+		"sub1" : {
+			"run1": "data/raw/sub001/BOLD/task001_run001/bold_dico_dico7Tad2grpbold7Tad.nii",
+			"run2": "data/raw/sub001/BOLD/task001_run002/bold_dico_dico7Tad2grpbold7Tad.nii",
+			"run3": "data/raw/sub001/BOLD/task001_run003/bold_dico_dico7Tad2grpbold7Tad.nii",
+			"run4": "data/raw/sub001/BOLD/task001_run004/bold_dico_dico7Tad2grpbold7Tad.nii",
+			"run5": "data/raw/sub001/BOLD/task001_run005/bold_dico_dico7Tad2grpbold7Tad.nii",
+			"run6": "data/raw/sub001/BOLD/task001_run006/bold_dico_dico7Tad2grpbold7Tad.nii",
+			"run7": "data/raw/sub001/BOLD/task001_run007/bold_dico_dico7Tad2grpbold7Tad.nii",
+			"run8": "data/raw/sub001/BOLD/task001_run008/bold_dico_dico7Tad2grpbold7Tad.nii"
+		}
+	}
+}
