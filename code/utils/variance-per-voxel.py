@@ -22,8 +22,8 @@ def load_image(fname):
 
 def isolate_vol(data, n):
 	"""
-	Selects the (n+1)th volume from the 4-D image data array by slicing over the
-	last dimension.
+	Selects the (n+1)th volume from the 4-D image data array by slicing over
+	the last dimension.
 
 	Parameters
 	----------
