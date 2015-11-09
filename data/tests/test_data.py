@@ -10,7 +10,7 @@ def test_check_hashes():
         temp.write(b'Some data')
         temp.flush()
         fname = temp.name
-        d = {fname: "5b82f8bf4df2bfb0e66ccaa7306fd024"}
+        d = [(fname, '5b82f8bf4df2bfb0e66ccaa7306fd024')]
         assert data.check_hashes(d)
-        d = {fname: "4b82f8bf4df2bfb0e66ccaa7306fd024"}
+        d = [(fname, '4b82f8bf4df2bfb0e66ccaa7306fd024')]
         assert not data.check_hashes(d)
