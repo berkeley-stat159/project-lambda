@@ -2,7 +2,6 @@ from __future__ import print_function
 import hashlib
 import json
 
-DATA_PATHS = json.load(open('data_path.json'))
 
 def get_hash_values(data_paths):
     paths = data_paths['bold_dico_7Tad2grpbold7Tad']['sub1']['runs']
@@ -33,4 +32,6 @@ def check_hashes(d):
 
 
 if __name__ == '__main__':
+    with open('data_path.json', 'r') as fh:
+        DATA_PATHS = json.load(fh)
     check_hashes(get_hash_values(DATA_PATHS))
