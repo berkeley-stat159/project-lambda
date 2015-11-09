@@ -1,16 +1,13 @@
 from __future__ import print_function
-
 import hashlib
 import json
-import os
 
+DATA_PATHS = json.load(open('data_path.json'))
 
-d = [('ds107_sub001_highres.nii', 'fd733636ae8abe8f0ffbfadedd23896c')]
-
-def get_data_paths():
-    data_path = json.load(open('data_path.json'))
-    paths = data_path['bold_dico_7Tad2grpbold7Tad']['sub1']['runs']
+def get_hash_values(data_paths):
+    paths = data_paths['bold_dico_7Tad2grpbold7Tad']['sub1']['runs']
     return [(p['path'].replace('data/', ''), p['hash']) for p in paths]
+
 
 def generate_file_md5(filename, blocksize=2**20):
     m = hashlib.md5()
@@ -36,4 +33,4 @@ def check_hashes(d):
 
 
 if __name__ == '__main__':
-    check_hashes(get_data_paths())
+    check_hashes(get_hash_values(DATA_PATHS))
