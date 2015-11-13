@@ -11,16 +11,16 @@ description.
 
 def get_scene_slices():
 
-    segment_duration = {
-        0: 902,
-        1: 882,
-        2: 876,
-        3: 976,
-        4: 924,
-        5: 878,
-        6: 1086,
-        7: 673.4
-    }
+    # segment_duration = {
+    #     0: 902,
+    #     1: 882,
+    #     2: 876,
+    #     3: 976,
+    #     4: 924,
+    #     5: 878,
+    #     6: 1086,
+    #     7: 673.4
+    # }
 
     # scene_desc is a dictionary mapping a time to a tuple
     # where the first value corresponds to if scene happened in the day time
@@ -28,6 +28,7 @@ def get_scene_slices():
     scene_desc = {}
     IS_DAY = 0
     IS_INT = 1
+
     with open('../../ds113_study_description/stimulus/task001/annotations/scenes.csv', 'rb') as csvfile:
         reader = csv.DictReader(csvfile, fieldnames=['seconds', 'scene', 'day-night', 'int-ext'])
         for row in reader:
