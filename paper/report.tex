@@ -2,7 +2,7 @@
 
 \usepackage[margin=0.75in]{geometry}
 
-\title{fMRI Dataset from Complex Natural Simulation with Forrest Gump: A Restudy}
+\title{fMRI Dataset from Complex Natural Stimulation with Forrest Gump: A Restudy}
 \author{
   Chang, Jordeen\\
   \texttt{jodreen}
@@ -22,14 +22,14 @@
 \begin{document}
 \maketitle
 
-\abstract{Most fMRI studies use highly simplified stimulus that are vastly dissimilar
-from what people experience in everyday life. This study sought to create
-a dataset of naturally occurring brain states by exposing participants
-to a more complex stimulus, the audio description of Forrest Gump. This particular
-audio description allows for the study of auditory attention and cognition,
-language and music perception, and retrieval of explicit memory without the
-effect of visual imagery. In addition, this dataset uses inter-individual
-synchronicity to study responses to complex processing. Originally,
+\abstract{Most fMRI studies use highly simplified stimulus that are vastly
+dissimilar from what people experience in everyday life. This study sought to
+create a dataset of naturally occurring brain states by exposing participants
+to a more complex stimulus, the audio description of Forrest Gump. This
+particular audio description allows for the study of auditory attention and
+cognition, language and music perception, and retrieval of explicit memory
+without the effect of visual imagery. In addition, this dataset uses inter-
+individual synchronicity to study responses to complex processing. Originally,
 representational similarity analysis was used to identify similar patterns
 across brains.}
 
@@ -37,7 +37,7 @@ across brains.}
 
 The main purpose of the original study was to examine properties of brain
 response patterns that are supposedly common when people are exposed to audio
-and movie simulation. We intend to replicate their experiment using the data
+and movie stimulation. We intend to replicate their experiment using the data
 they gathered from the 20 participants. For example, a BOLD time-series
 similarity measure (e.g. correlation) is often used to quantify similarities
 in responses among individuals. Hank et al. recognized that this was a common
@@ -70,7 +70,7 @@ The data is curated and segmented into 20 .TGZ files, where each of the 20
 subject accounts for approximately 16 GBs of data. We verified the usability
 of the data by inspecting and loading data corresponding to subject 1. We
 limited our initial exploration to a single subject since downloading each
-.TGZ takes approximately one hour.  The download for each subject includes a
+.TGZ takes approximately one hour. The download for each subject includes a
 lot of other information besides just the fMRI data, such as cardiac and
 respiratory trace, angiographies, and structural MRI data. Each subject's fMRI
 data includes several formats: Raw BOLD functional MRI, Raw BOLD functional
@@ -88,9 +88,9 @@ We will not be using all of the data. The data
 files are very large: for each subject, the download size is approximately 16
 GB, and that does not even include unzipping all the file inside. Given that
 we have twenty subjects, downloading all of this could be a paper in it of
-itself. and since the focus of this class is mainly fMRI data, we decided to
+itself. Since the focus of this class is mainly fMRI data, we decided to
 ignore everything else. However, the fMRI data is still not of a trivial size
-because three versions of the data is included: the raw data, the linear
+because three versions of the data are included: the raw data, the linear
 alignment, and the non-linear alignment. We will only be choosing one of them
 (the one linearly aligned) because using all of them would just be redundant.
 
@@ -107,7 +107,7 @@ After perusing all the stimulus related data (e.g. data
 annotating each Forest Gump scene and when a subject was exposed to that
 scene), we decided to guide part of our analysis to see if we could summarize
 any interesting trends in fMRI response with respect to these features.
-Additionally, by investigating a single subject for our initial analysis  and
+Additionally, by investigating a single subject for our initial analysis and
 using the linearly aligned transformed data, we have limited our project’s
 scope to approximately 5 GBs from the roughly 320 GBs that were published with
 the paper. With the data reduced to a manageable state, we have successfully
@@ -118,11 +118,11 @@ for our python scripts to find and load data in the project repository.
 We are deviating from the original data analysis. The paper used the raw data
 which varied largely with every subject, and processed that by standardizing
 among twenty of them with both linear alignments and non-linear alignments. We
-decided that we would just use the already processed linearly aligned data
+decided that we would simply use the already processed linearly aligned data
 since they already provided it, and we would not be able to do it as well as
 them.
 
-Our initial plan is to first just conduct some basic exploratory data analysis
+Our initial plan is to first conduct basic exploratory data analysis
 and then further delve into the findings that strike us as intriguing or
 unusual. We began by writing functions that loaded the .nii files for each
 subject and calculated and plotted the standard deviations across voxels. From
@@ -140,12 +140,12 @@ After determining which points in time were during the day and which were
 during the night, and which were inside and which were outside, we can perform
 a t-test to determine if the signal is significantly different between each of
 the two groups for each voxel.  We will perform a multiple comparisons test to
-correct for the number of t-tests we will be running.   We will also model
+correct for the number of t-tests we will be running. We will also model
 each of those voxels that are statistically significant to see what their time
 courses look like.
 
 We have a few ideas as to what questions to ask, but are in the process of
-looking at other ideas.  There is an entire website dedicated to studying this
+looking at other ideas. There is an entire website dedicated to studying this
 dataset, studyforrest.org, and we are researching to see what other people
 have done.
 
