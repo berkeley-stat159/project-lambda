@@ -2,7 +2,9 @@
 
 \usepackage[margin=0.75in]{geometry}
 
-\title{fMRI Dataset from Complex Natural Simulation with Forrest Gump: A Restudy}
+\title{
+fMRI Dataset from Complex Natural Stimulation with Forrest Gump: A Restudy
+}
 \author{
   Chang, Jordeen\\
   \texttt{jodreen}
@@ -20,70 +22,202 @@
 \bibliographystyle{siam}
 
 \begin{document}
-\maketitle  
+\maketitle
 
-\abstract{Most fMRI studies use highly simplified stimulus that are vastly dissimilar
-from what people experience in everyday life. This study sought to create
-a dataset of naturally occurring brain states by exposing participants
-to a more complex stimulus, the audio description of Forrest Gump. This particular
-audio description allows for the study of auditory attention and cognition, 
-language and music perception, and retrieval of explicit memory without the
-effect of visual imagery. In addition, this dataset uses inter-individual 
-synchronicity to study responses to complex processing. Originally,
+\abstract{Most fMRI studies use highly simplified stimulus that are vastly
+dissimilar from what people experience in everyday life. This study sought to
+create a dataset of naturally occurring brain states by exposing participants
+to a more complex stimulus, the audio description of Forrest Gump. This
+particular audio description allows for the study of auditory attention and
+cognition, language and music perception, and retrieval of explicit memory
+without the effect of visual imagery. In addition, this dataset uses inter-
+individual synchronicity to study responses to complex processing. Originally,
 representational similarity analysis was used to identify similar patterns
 across brains.}
 
 \section{Introduction}
 
-The main purpose of the original study was to examine properties of brain response
-patterns that are supposedly common when people are exposed to audio and movie
-simulation. We intend to replicate their experiment using the data they gathered
-from the 20 participants. For example, a BOLD time-series similarity measure
-(e.g. correlation) is often used to quantify similarities in responses among
-individuals. Hank et al. recognized that this was a common approach, but they
-went beyond that and also implemented representational similarity analysis 
-(RSA). To do so, we will create dissimilarity matrices for 18 individuals using
-the same searchlight mapping approach that they used (Subjects 4 and 10 were not
-included due to missing data). Doing so will capture 2nd-order isomorphisms in
-response patterns. Lastly, to access statistical significance, we will transform
-the representational consistency map into percent rank with respect to the total
-distribution of the DSM correlations. We'll calculate the mean correlation
-coefficient and compare our value to theirs.
+The main purpose of the original study was to examine properties of brain
+response patterns that are supposedly common when people are exposed to audio
+and movie stimulation. We intend to replicate their experiment using the data
+they gathered from the 20 participants. For example, a BOLD time-series
+similarity measure (e.g. correlation) is often used to quantify similarities
+in responses among individuals. Hanke et al. recognized that this was a common
+approach, but they went beyond that and also implemented representational
+similarity analysis (RSA). To do so, we will create dissimilarity matrices for
+18 individuals using the same searchlight mapping approach that they used
+(Subjects 4 and 10 were not included due to missing data). Doing so will
+capture 2nd-order isomorphisms in response patterns. Lastly, to access
+statistical significance, we will transform the representational consistency
+map into percent rank with respect to the total distribution of the DSM
+correlations. We'll calculate the mean correlation coefficient and compare our
+value to theirs.
 
 Before we formally began, we performed basic sanity checks on the data. We
 have downloaded and loaded the files successfully, and we have confirmed that
-we have data from all subjects. Reproducibility is crucial in research, especially
-when such high volumes of data are involved, because it allows other people to
-fact check the work. When people collaborate, new insights can be shed and the
-rate of progress is expedited. For this study, we will begin by following the 
-exact steps Hanke and his team took. Along the way, when we have identified areas
-that they did not have time to thoroughly research, we will then delve deeper in
-an effort to shed more insights.
+we have data for a test subject. Reproducibility is crucial in research,
+especially when such high volumes of data are involved, because it allows
+other people to fact check the work. When people collaborate, new insights can
+be shed and the rate of progress is expedited. For this study, we will begin
+by extracting data we see fitting, and proposing interesting questions that we
+will attempt to answer.
 
 Identify a published fMRI paper and the accompanying data
 \cite{hank2014audiomovie}.
 
 \section{Data}
-The data is curated and segmented into 20 .TGZ files, where each of the 20 .TGZ 
-files corresponds to one of the 20 subjects in the experiment. Each subject 
-accounts for approximately 16 GBs of data. We verified the usability of the data
-by inspecting and loading data corresponding to subject 1. We limited our 
-initial exploration to a single subject since downloading each .TGZ takes 
-approximately one hour. To ensure speedy access to the overall dataset when we 
-begin central project work, our strategy for getting all the data entails each 
-group member spending five hours downloading a different quarter of the overall
-dataset, and then locally transferring the remaining three-quarters of the data
-from our harddrives. Each subject's data includes several formats: subject
-metadata(CSV), Raw BOLD functional MRI, Raw BOLD functional MRI 
-(with applied distortion correction), Raw BOLD functional MRI (linear anatomical
-alignment), Raw BOLD functional MRI (non-linear anatomical alignment), along 
-with several Structural MRI datasets. The corrected and aligned versions of the
-data attempt to eliminate device and scan related noise. Scan data is 
-accessible in nibabel compatible formats (.NII).
+
+The data is curated and segmented into 20 .TGZ files, where each of the 20
+.TGZ files corresponds to one of the 20 subjects in the experiment. Each
+subject accounts for approximately 16 GBs of data. We verified the usability
+of the data by inspecting and loading data corresponding to subject 1. We
+limited our initial exploration to a single subject since downloading each
+.TGZ takes approximately one hour. The download for each subject includes a
+lot of other information besides just the fMRI data, such as cardiac and
+respiratory trace, angiographies, and structural MRI data. Each subject's fMRI
+data includes several formats: Raw BOLD functional MRI, Raw BOLD functional
+MRI (with applied distortion correction), Raw BOLD functional MRI (linear
+anatomical alignment), and Raw BOLD functional MRI (non-linear anatomical
+alignment). The corrected and aligned versions of the data attempt to
+eliminate device and scan related noise. Scan data is accessible in nibabel
+compatible formats (.NII).
 
 \section{Methods}
+
+\subsection{Extracting Data}
+
+We will not be using all of the data. The data
+files are very large: for each subject, the download size is approximately 16
+GB, and that does not even include unzipping all the file inside. Given that
+we have twenty subjects, downloading all of this could be a paper in it of
+itself. Since the focus of this class is mainly fMRI data, we decided to
+ignore everything else. However, the fMRI data is still not of a trivial size
+because three versions of the data are included: the raw data, the linear
+alignment, and the non-linear alignment. We will only be choosing one of them
+(the one linearly aligned) because using all of them would just be redundant.
+
+We will be only working with the first subject for now for testing purposes,
+but if time allows, we will run our code on a couple of other subjects for
+comparison testing. And to ensure speedy access to other subjects' datasets,
+our strategy for getting all the data entails each group member downloading a
+different quarter of the overall dataset, and then locally transferring the
+remaining three-quarters of the data from our hard drives.
+
+\subsection{Analysis}
+
+After perusing all the stimulus related data (e.g. data
+annotating each Forest Gump scene and when a subject was exposed to that
+scene), we decided to guide part of our analysis to see if we could summarize
+any interesting trends in fMRI response with respect to these features.
+Additionally, by investigating a single subject for our initial analysis and
+using the linearly aligned transformed data, we have limited our project’s
+scope to approximately 5 GBs from the roughly 320 GBs that were published with
+the paper. With the data reduced to a manageable state, we have successfully
+overcome this obstacle. Finally, by introducing a data\_path.json file to
+reference where each raw data file is located, we have designed a clean schema
+for our python scripts to find and load data in the project repository.
+
+We are deviating from the original data analysis. The paper used the raw data
+which varied largely with every subject, and processed that by standardizing
+among twenty of them with both linear alignments and non-linear alignments. We
+decided that we would simply use the already processed linearly aligned data
+since they already provided it, and we would not be able to do it as well as
+them.
+
+Our initial plan is to first conduct basic exploratory data analysis
+and then further delve into the findings that strike us as intriguing or
+unusual. We began by writing functions that loaded the .nii files for each
+subject and calculated and plotted the standard deviations across voxels. From
+there, we will continue our analysis by isolating outliers and referencing
+those data points with the corresponding movie time to look for correlations
+between certain movie scenes and certain physiological responses.
+
+After exploring the files provided for Forrest Gump, we saw that there exists
+a csv file of the scenes in the movie with a time-stamp, a brief scene
+description, whether it takes place in day or night, and if it is inside or
+outside. We will try to see if there is anything interesting in the data based
+on these characteristics of the movie scenes.
+
+After determining which points in time were during the day and which were
+during the night, and which were inside and which were outside, we can perform
+a t-test to determine if the signal is significantly different between each of
+the two groups for each voxel.  We will perform a multiple comparisons test to
+correct for the number of t-tests we will be running. We will also model
+each of those voxels that are statistically significant to see what their time
+courses look like.
+
+We have a few ideas as to what questions to ask, but are in the process of
+looking at other ideas. There is an entire website dedicated to studying this
+dataset, studyforrest.org, and we are researching to see what other people
+have done.
+
+
 \section{Results}
+
+So far, we have written functions that plot the standard
+deviations across voxels for individual subjects using Matlibplot. In
+addition, we also plan on exploring possible differences in physiological
+responses to certain movie scenes by gender and age. Given that we would have
+to comb through around 16 GB worth of data just for each subject, we will
+initially narrow our analysis to just one representative from each group (e.g.
+one female and one male). And if time permits, we will run the our analysis on
+all 20 subjects (e.g. 8 females and 12 males).
+
+
 \section{Discussion}
+\subsection{Strengths}
+
+Making our project reproducible is among our strengths. Our team has a firm
+understanding of command line and python scripts, along with the importance of
+grouping common behavior in general functions, such as not merging new
+functions into master unless those functions are unit tested, to ensure that
+a) functions work according to specified behavior and b) future changes do not
+break functions that had been working.
+
+Learning how to work with the data in class was helpful because we have never
+worked with images in that type of format. We were not familiar with libraries
+like nibabel and thus it was very helpful to see how we could use them in our
+analyses. Exercises working with other fMRI data and various calculations we
+could perform on them was informative and relevant.
+
+
+\subsection{Obstacles}
+
+The main objective of the original study and paper was to gather raw data,
+mostly for other researchers to use in their own studies. Consequently, we
+were not given much direction in terms of what analyses we should initially
+conduct or reproduce. Also, as previously mentioned, the sheer amount of data
+we have to work with is almost overwhelming, especially given our limited
+computing resources. However, we assuaged this issue by using external hard
+drives to transfer data among group members.
+
+We have differing prior experiences with Github and with research.  Those who
+have more experience with git and Github help those who have less experience
+set up repos and push and pull correctly.  Finding a method of communication
+was another issue we initially faced: we have been communicating via Facebook,
+and switching to communicate on Github to directly reference code has been
+difficult.  As a result, many issues on Github and pull requests have not been
+seen by other members.  We have addressed this issue by reminding one another
+to look at pull requests on Facebook. We have varying areas of expertise, such
+as code review and statistical analysis, but we have used that to our
+advantage by having group members work on their areas of expertise.
+
+Understanding the data - specifically in terms distinguishing the several
+forms of normalized data - and what conclusions we can draw is difficult, but
+we understand that that is beyond the scope of our project. Although our main
+goal is to become familiar with reproducibility and collaboration via the
+software tools taught in class, feeling shaky on understanding the statistical
+meaning of our results is disconcerting. For example, a deeper understanding
+of time series would enable us to perform stronger statistical techniques.
+
+To successfully complete our project we need to keep the data we use well
+structured and organized, perform insightfully and interpretable exploratory
+data analysis, and perform hypothesis tests referencing Forest Gump scene
+features (although these tests are not expected to indicate causal
+inferences). Finally success also depends on doing these items in a
+reproducible and collaborative manner. We must strive to automate our analysis
+routines through command line interfaces and exploit the modern git and github
+workflow.
 
 
 \bibliography{project}
