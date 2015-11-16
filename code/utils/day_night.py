@@ -1,5 +1,6 @@
 import nibabel as nib
 import csv
+import json
 # import pprint as pp
 
 
@@ -8,19 +9,12 @@ ext_slices, each of which contain the indices that correspond to the scene
 description.
 '''
 
+with open('../../data/data_path.json', 'r') as fh:
+    DATA_PATHS = json.load(fh)
 
-def get_scene_slices():
+def get_scene_slices(run_num):
 
-    # segment_duration = {
-    #     0: 902,
-    #     1: 882,
-    #     2: 876,
-    #     3: 976,
-    #     4: 924,
-    #     5: 878,
-    #     6: 1086,
-    #     7: 673.4
-    # }
+    segment_duration = [902, 882, 876, 976, 924, 878, 1086, 673.4]
 
     # scene_desc is a dictionary mapping a time to a tuple
     # where the first value corresponds to if scene happened in the day time
@@ -38,7 +32,10 @@ def get_scene_slices():
     scene_keys = scene_desc.keys()
     scene_keys.sort()
 
-    img = nib.load('../../sub001/BOLD/task001_run001/bold_dico_dico7Tad2grpbold7Tad.nii')
+    img_path = "../../" + DATA_PATHS['bold_dico_7Tad2grpbold7Tad']['sub1']['runs'][run_num]["path"]
+
+    img = nib.load(img_path)
+    # img = nib.load('../../sub001/BOLD/task001_run001/bold_dico_dico7Tad2grpbold7Tad.nii')
 
     # These arrays contain the indices of relevant corresponding time slices
     day_slices = []
@@ -48,11 +45,19 @@ def get_scene_slices():
 
     # Keeping track of where we are in the scene list
     key_index = 0
+    scene_start = 0
+    for i in range(run_num):
+        scene_start += segment_duration[i]
+    for i in range(len(scene_keys)):
+        if scene_keys[i + 1] > scene_start:
+            key_index = i
+            break
     for i in range(img.shape[3]):
         if i * 2 >= scene_keys[key_index]:
             key_index += 1
         curr_time = scene_keys[key_index]
         day_slices.append(i) if scene_desc[curr_time][IS_DAY] else night_slices.append(i)
         int_slices.append(i) if scene_desc[curr_time][IS_INT] else ext_slices.append(i)
-
-    return (day_slices, night_slices, int_slices, ext_slices)
+    print (day_slices, night_slices, int_slices, ext_slices)
+    return
+get_scene_slices(0)
