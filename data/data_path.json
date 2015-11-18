@@ -1,0 +1,40 @@
+{
+	"bold_dico_7Tad2grpbold7Tad": {
+		"sub1" : {
+			"runs" : [
+				{
+					"path": "data/raw/sub001/BOLD/task001_run001/bold_dico_dico7Tad2grpbold7Tad.nii",
+					"hash": "b4350e69fdbb5c62e4c8be66e71c2d86"
+				},
+				{
+					"path": "data/raw/sub001/BOLD/task001_run002/bold_dico_dico7Tad2grpbold7Tad.nii",
+					"hash": "ec625fd0de6433cfecbfb542a6598683"
+				},
+				{
+					"path": "data/raw/sub001/BOLD/task001_run003/bold_dico_dico7Tad2grpbold7Tad.nii",
+					"hash": "9b92dc4fb03bc5080f7eae904782424a"
+				},
+				{
+					"path": "data/raw/sub001/BOLD/task001_run004/bold_dico_dico7Tad2grpbold7Tad.nii",
+					"hash": "658cb0bcbfe28286af1514a232d1d79d"
+				},
+				{
+					"path": "data/raw/sub001/BOLD/task001_run005/bold_dico_dico7Tad2grpbold7Tad.nii",
+					"hash": "3d299ebfc9aa9e4419d3f185068fd5a2"
+				},
+				{
+					"path": "data/raw/sub001/BOLD/task001_run006/bold_dico_dico7Tad2grpbold7Tad.nii",
+					"hash": "e381354cf8fcb8dcd50d711e0cd24d92"
+				},
+				{
+					"path": "data/raw/sub001/BOLD/task001_run007/bold_dico_dico7Tad2grpbold7Tad.nii",
+					"hash": "814090d79f447671ae483ec2ea9dde3c"
+				},
+				{
+					"path": "data/raw/sub001/BOLD/task001_run008/bold_dico_dico7Tad2grpbold7Tad.nii",
+					"hash": "4fc0745cb64f76cd9cf43d6351de5848"
+				}
+			]
+		}
+	}
+}
