@@ -1,19 +1,14 @@
 import nibabel as nib
 import csv
 import json
-# import pprint as pp
 
-
-''' Returns a tuple of four arrays: day_slices, night_slices, int_slices, and
-ext_slices, each of which contain the indices that correspond to the scene
-description.
-'''
 IS_DAY = 0
 IS_INT = 1
 DAY_IND = 0
 NIGHT_IND = 1
 INT_IND = 2
 EXT_IND = 3
+
 
 class SceneSlicer:
     def __init__(self, sub_num, path_to_root):
@@ -28,12 +23,6 @@ class SceneSlicer:
         self.scene_keys = []
 
     def generate_scene_desc_dict(self):
-        # scene_desc is a dictionary mapping a time to a tuple where the first
-        # value corresponds to if scene happened in the day time and the
-        # second corresponds to if the scene was internal
-        IS_DAY = 0
-        IS_INT = 1
-
         with open(self.path_to_root + 'ds113_study_description/stimulus/task001/annotations/scenes.csv', 'rb') as csvfile:
             reader = csv.DictReader(csvfile, fieldnames=['seconds', 'scene', 'day-night', 'int-ext'])
             for row in reader:
@@ -63,7 +52,6 @@ class SceneSlicer:
             ext_slices = []
             img = self.images[run_num]
 
-            # Keeping track of where we are in the scene list
             key_index = 0
             scene_start = 0
             for i in range(run_num):
@@ -82,8 +70,6 @@ class SceneSlicer:
             self.scene_slices[run_num] = (day_slices, night_slices, int_slices, ext_slices)
         return self.scene_slices[run_num]
 
-    # Returns a tuple, first element indicats if is day, second element
-    # indicates if scene slice is interior
     def get_day_night(self, run_num, slice):
         if not self.scene_slices[run_num]:
             self.get_scene_slices(run_num)
