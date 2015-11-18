@@ -60,7 +60,6 @@ class SceneSlicer:
                 if self.scene_keys[i] > scene_start:
                     key_index = i
                     break
-            print self.scene_keys
             for i in range(img.shape[3]):
                 if key_index + 1 < len(self.scene_keys) and (i * 2) + scene_start >= self.scene_keys[key_index + 1]:
                     key_index += 1
