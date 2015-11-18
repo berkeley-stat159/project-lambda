@@ -8,7 +8,7 @@ IS_INT = 1
 
 
 def test_scene_slicer_init():
-    ss = scene_slicer.SceneSlicer(1, "../../")
+    ss = scene_slicer.SceneSlicer(1, "")
     assert ss.sub_num == 1
     assert len(ss.images) == 8
     assert len(ss.scene_slices) == 8
@@ -18,7 +18,7 @@ def test_scene_slicer_init():
 
 
 def test_scene_slicer_dict():
-    ss = scene_slicer.SceneSlicer(1, "../../")
+    ss = scene_slicer.SceneSlicer(1, "")
     ss.generate_scene_desc_dict()
     for i in ss.scene_desc:
         len(ss.scene_desc[i]) == 2
@@ -27,18 +27,18 @@ def test_scene_slicer_dict():
 
 
 def test_scene_slicer_image():
-    ss = scene_slicer.SceneSlicer(1, "../../")
+    ss = scene_slicer.SceneSlicer(1, "")
     ss.get_image(2)
     assert ss.images[2] != 0
 
 
 def test_scene_slicer_slices():
-    ss = scene_slicer.SceneSlicer(1, "../../")
+    ss = scene_slicer.SceneSlicer(1, "")
     ss.get_scene_slices(4)
     assert ss.scene_slices[4] != 0
 
 
 def test_scene_slicer_day_night():
-    ss = scene_slicer.SceneSlicer(1, "../../")
+    ss = scene_slicer.SceneSlicer(1, "")
     scene_tup = ss.get_day_night(1, 0)
     assert scene_tup == (True, False)
