@@ -39,7 +39,7 @@ class SceneSlicer:
                 scene_time = int(float(row['seconds']))
                 self.scene_desc[scene_time] = (row['day-night'] == "DAY",
                                                row['int-ext'] == "INT")
-        self.scene_keys = self.scene_desc.keys()
+        self.scene_keys = list(self.scene_desc.keys())
         self.scene_keys.sort()
 
     def get_image(self, run_num):
