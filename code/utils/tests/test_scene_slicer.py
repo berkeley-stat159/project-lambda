@@ -12,8 +12,8 @@ IS_INT = 1
 
 
 def test_prepare():
-    data = np.array([[[[7, 9], [7, 8]], [[1, 2], [1, 8]]],
-                     [[[2, 3], [2, 1]], [[5, 4], [4, 3]]]])
+    data = np.array([[[[7, 9], [7, 8]], [[1, 2], [1, 8]]], [[[2, 3], [2, 1]],
+                                                            [[5, 4], [4, 3]]]])
     img = nib.Nifti1Image(data, affine=np.diag([1, 1, 1, 1]))
     nib.save(img, 'test_data.nii')
     with open('scene.csv', 'w') as csvfile:
@@ -36,6 +36,7 @@ def test_scene_slicer_init():
     assert ss.segment_duration == [902, 882, 876, 976, 924, 878, 1086, 673.4]
     delete_files()
 
+
 def test_scene_slicer_dict():
     ss = test_prepare()
     ss.generate_scene_desc_dict()
@@ -45,11 +46,13 @@ def test_scene_slicer_dict():
         assert ss.scene_desc[i][IS_INT] == 0 or ss.scene_desc[i][IS_INT] == 1
     delete_files()
 
+
 def test_scene_slicer_image():
     ss = test_prepare()
     ss.get_image(0)
     assert ss.images[0] != 0
     delete_files()
+
 
 def test_scene_slicer_slices():
     ss = test_prepare()
@@ -57,9 +60,9 @@ def test_scene_slicer_slices():
     assert ss.scene_slices[0] != 0
     delete_files()
 
+
 def test_scene_slicer_day_night():
     ss = test_prepare()
     scene_tup = ss.get_day_night(0, 0)
     assert scene_tup == (True, False)
     delete_files()
-
