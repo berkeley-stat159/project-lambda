@@ -5,7 +5,10 @@ import numpy as np
 import matplotlib
 
 from numpy.testing import assert_almost_equal, assert_array_equal
-from mock import patch
+try:
+    from mock import patch
+except:
+    from unittest.mock import patch
 import unittest
 
 class PlotSlicesTestCase(unittest.TestCase):
