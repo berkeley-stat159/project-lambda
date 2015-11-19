@@ -9,21 +9,24 @@ NIGHT_IND = 1
 INT_IND = 2
 EXT_IND = 3
 
+# with open('../../data/data_path.json', 'r') as fh:
+#     data_paths = json.load(fh)
+# path_to_images = []
+# for i in range(8):
+#     path_to_images.append("../../" + data_paths['bold_dico_7Tad2grpbold7Tad']['sub1']['runs'][0]['path'])
 
 class SceneSlicer:
-    def __init__(self, sub_num, path_to_root):
-        self.path_to_root = path_to_root
-        with open(self.path_to_root + 'data/data_path.json', 'r') as fh:
-            self.data_paths = json.load(fh)
-        self.images = [0] * 8
-        self.scene_slices = [0] * 8
-        self.sub_num = sub_num
+    def __init__(self, path_to_images, path_to_scene_csv="../../ds113_study_description/stimulus/task001/annotations/scenes.csv"):
+        self.path_to_images = path_to_images
+        self.path_to_scene_csv = path_to_scene_csv
+        self.images = [0] * len(path_to_images)
+        self.scene_slices = [0] * len(path_to_images)
         self.segment_duration = [902, 882, 876, 976, 924, 878, 1086, 673.4]
         self.scene_desc = {}
         self.scene_keys = []
 
     def generate_scene_desc_dict(self):
-        with open(self.path_to_root + 'ds113_study_description/stimulus/task001/annotations/scenes.csv', 'rb') as csvfile:
+        with open(self.path_to_scene_csv, 'rb') as csvfile:
             reader = csv.DictReader(csvfile, fieldnames=['seconds', 'scene', 'day-night', 'int-ext'])
             for row in reader:
                 scene_time = int(float(row['seconds']))
@@ -33,9 +36,7 @@ class SceneSlicer:
 
     def get_image(self, run_num):
         if self.images[run_num] == 0:
-            sub_str = 'sub' + str(self.sub_num)
-            img_path = self.path_to_root + self.data_paths['bold_dico_7Tad2grpbold7Tad'][sub_str]['runs'][run_num]["path"]
-            img = nib.load(img_path)
+            img = nib.load(self.path_to_images[run_num])
             self.images[run_num] = img
         return self.images[run_num]
 
@@ -76,3 +77,4 @@ class SceneSlicer:
         is_day_slice = slice in scene_slices[DAY_IND]
         is_int_slice = slice in scene_slices[INT_IND]
         return (is_day_slice, is_int_slice)
+
