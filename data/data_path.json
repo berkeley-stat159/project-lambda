@@ -76,6 +76,50 @@
 						}
 					}
 				]
+			},
+			{
+				"runs" : [
+					{	
+						"rcds" : {
+							"path": "data/raw/sub002/task001_run001/bold_dico_dico_rcds_nl.nii"
+						}
+					},
+					{	
+						"rcds" : {
+							"path": "data/raw/sub002/task001_run002/bold_dico_dico_rcds_nl.nii"
+						}
+					},
+					{	
+						"rcds" : {
+							"path": "data/raw/sub002/task001_run003/bold_dico_dico_rcds_nl.nii"
+						}
+					},
+					{	
+						"rcds" : {
+							"path": "data/raw/sub002/task001_run004/bold_dico_dico_rcds_nl.nii"
+						}
+					},
+					{	
+						"rcds" : {
+							"path": "data/raw/sub002/task001_run005/bold_dico_dico_rcds_nl.nii"
+						}
+					},
+					{	
+						"rcds" : {
+							"path": "data/raw/sub002/task001_run006/bold_dico_dico_rcds_nl.nii"
+						}
+					},
+					{	
+						"rcds" : {
+							"path": "data/raw/sub002/task001_run007/bold_dico_dico_rcds_nl.nii"
+						}
+					},
+					{	
+						"rcds" : {
+							"path": "data/raw/sub002/task001_run008/bold_dico_dico_rcds_nl.nii"
+						}
+					}
+				]
 			}
 		],
 	"templates": {
