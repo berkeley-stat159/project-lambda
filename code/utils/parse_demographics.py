@@ -26,12 +26,9 @@ def parse_csv(fname):
 	-------
 	subjects : array
 	"""
-    subjects = []
     with open(fname) as csvfile:
         reader = csv.DictReader(csvfile)
-        for row in reader:
-            subjects.append(Subject(row))
-        return subjects
+        return [Subject(row) for row in reader]
 
 
 def seen_most_times(subjects):
@@ -72,14 +69,13 @@ def seen_least_times(subjects):
     subject : tuple
     Tuple contains both the count of how many times watched and subject's ID
     """
-    count = 1000
-    subject_id = -1
-    for subject in subjects:
-        subject.forrest_seen_count = curr_count
-        if curr_count < count and curr_count > -1:
-            count = curr_count
+    min_count = subjects[0].forrest_seen_count
+    subject_id = subject[0].id
+    for subject in subjects[1:]:
+        if subject.forrest_seen_count < min_count:
+            min_count = subject.forrest_seen_count
             subject_id = subject.id
-    return (count, subject_id)
+    return (min_count, subject_id)
 
 
 def find_id_by_gender(subjects, gender):
@@ -95,11 +91,7 @@ def find_id_by_gender(subjects, gender):
     -------
     ids : int array
     """
-    ids = []
-    for subject in subjects:
-        if subject.gender == gender:
-            ids.append(subject.id)
-    return ids
+    return [s.gender for s in subjects if s.gender == gender]
 
 
 def find_count_by_id(subjects, sid):
