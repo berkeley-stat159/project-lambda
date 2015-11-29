@@ -1,14 +1,15 @@
 # Python 3 compatibility
-from __future__ import absolute_import, division, print_function 
+from __future__ import absolute_import, division, print_function
 import numpy as np
 import matplotlib.pyplot as plt
 import numpy.linalg as npl
 from scipy.stats import t as t_dist
-
+from scipy.ndimage import gaussian_filter
 import scene_slicer
 import plot
 
-def get_design_matrix(data):                                                   
+
+def get_design_matrix(data):
     """
     Returns
     -------
@@ -16,39 +17,60 @@ def get_design_matrix(data):
     the linear drift column, and the column of ones
     """
     n_trs = data.shape[-1]
-    X = np.ones((n_trs,5))   
-    day, inter, pos = data.scene_slicer.get_day_night()
-    X[:,0] = day
-    X[:,1] = inter
-    X[:,2] = pos
-    X[:,3] = np.linspace(-1, 1, n_trs)
+    X = np.ones((n_trs, 5))
+    ss = scene_slicer(data,'scenes.csv')
+    day, night, inter, exter = ss.get_scene_slices(0) # run over all runs
+    X[:, 0] = day
+    X[:, 1] = inter
+    X[:, 2] = pos
+    X[:, 3] = np.linspace(-1, 1, n_trs)
     return X
+
+
 def plot_design_matrix(X):
     """
     Returns
     -------
-    Nothing
+    None
     """
-    plt.imshow(X,aspect = 0.1, cmap='gray',interpolation='nearest')
-def get_betas(X,data):
-    Y = np.reshape(data,(data.shape[-1],-1))
+    plt.imshow(X, aspect=0.1, cmap='gray', interpolation='nearest')
+
+
+def get_betas(X, data):
+    """
+    Returns
+    -------
+    B: 2D array, p x B, the number of voxels
+    """
+    Y = np.reshape(data, (data.shape[-1], -1))
     B = npl.pinv(X).dot(Y)
     return B
-def get_betas_4d(B,data):
+
+
+def get_betas_4d(B, data):
     """
     Returns
     -------
-    4D array, beta for each voxel
+    4D array, beta for each voxel; need this format to plot
     """
-    b_vols = np.reshape(B, data.shape[:-1] + (-1))  
-    return b_vols
-def plot_betas(b_vols,col):
+    return np.reshape(B, data.shape[:-1] + (-1,))
+
+
+def plot_betas(b_vols, col):
     """
+    Parameters
+    ----------
+    b_vols: 2D array
+    col: integer between 0 and p
     Returns
     -------
-    Nothing
+    None
     """
-    plot.plot_central_slice(b_vols[...,col])
+    if col >= b_vols.shape[-1]:
+	    raise RuntimeError("Error: select a column between 0 and p")
+    plot.plot_central_slice(b_vols[..., col])
+
+
 def t_stat(y, X, c):
     """ betas, t statistic and significance test given data, 
     design matix, contrast
@@ -80,12 +102,10 @@ def t_stat(y, X, c):
     # calculate bottom half of t statistic
     SE = np.sqrt(MRSS * c.T.dot(npl.pinv(X.T.dot(X)).dot(c)))
     t = c.T.dot(beta) / SE
-    # Get p value for t value using cumulative density dunction
-    # (CDF) of t distribution
-    ltp = t_dist.cdf(t, df) # lower tail p
-    p = 1 - ltp # upper tail p
-    return beta, t, df, p
-def get_ts(Y,X,c,data):
+    return t
+
+
+def get_ts(Y, X, c, data):
     """
     Parameters
     ----------
@@ -100,10 +120,11 @@ def get_ts(Y,X,c,data):
     n_voxels = np.prod(data.shape[:-1])
     t = np.zeros(n_voxels)
     for num in range(n_voxels):
-	t[num] = t_stat(Y[:,num],X,c)[1]
-    return t
+        t[num] = t_stat(Y[:, num], X, c)
+    return abs(t)
 
-def get_top_20(t):
+    
+def get_top_100(t,thresh=100/1108800):
     """
     Parameters
     ----------
@@ -111,27 +132,28 @@ def get_top_20(t):
 
     Returns
     -------
-    1D array of position of voxels in top 20% of t-statistics (all are 
+    1D array of position of voxels in top 100 of t-statistics (all are 
     positive)
     """
-    a = np.int32(round(len(t)*.2))
-    top_20_voxels = np.argpartition(t, -a)[-a:]
-    return top_20_voxels
+    a = np.int32(round(len(t) * thresh))
+    top_100_voxels = np.argpartition(t, -a)[-a:]
+    return top_100_voxels
 
-def get_index_4d(data,top_20_voxels):
+
+def  get_index_4d(top_100_voxels, shape):
     """
     Returns
     -------
     Indices in terms of 4D array of each voxel in top 20% of t-statistics
     """
-    shape = data[...,-1].shape
-    axes = np.unravel_index(top_20_voxels,shape)
-    return zip(axes[0],axes[1],axes[2])
-def plot_single_voxel(data,top_20_voxels):
+    axes = np.unravel_index(top_100_voxels, shape)
+    return zip(axes[0], axes[1], axes[2])
+
+
+def plot_single_voxel(data, top_100_voxels):
     """
     Returns
     -------
     Nothing
     """
-    plt.plot(data[get_index_4d(data,top_20_voxels)[0]])
-
+    plt.plot(data[get_index_4d(data, top_100_voxels)[0]])
