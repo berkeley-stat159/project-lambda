@@ -60,8 +60,6 @@ class SceneSlicer:
                     IS_DAY] else day_night.append(1)
                 int_ext.append(0) if self.scene_desc[curr_time][
                     IS_INT] else int_ext.append(1)
-            print len(day_night)
-            print len(int_ext)
             self.scene_slices = (day_night, int_ext)
         return self.scene_slices
 
@@ -71,7 +69,6 @@ class SceneSlicer:
         is_day_slice = self.scene_slices[DAY_NIGHT_IND][slice] == 0
         is_int_slice = self.scene_slices[INT_EXT_IND][slice] == 0
         return (is_day_slice, is_int_slice)
-
 
 # ss = SceneSlicer(path_to_subject_image)
 # print ss.get_scene_slices()
