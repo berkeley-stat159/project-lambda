@@ -9,6 +9,9 @@ NIGHT_IND = 1
 INT_IND = 2
 EXT_IND = 3
 
+DAY_NIGHT_IND = 0
+INT_EXT_IND = 1
+
 with open('../../data/data_path.json', 'r') as fh:
     data_paths = json.load(fh)
 path_to_images = []
@@ -59,6 +62,10 @@ class SceneSlicer:
             night_slices = []
             int_slices = []
             ext_slices = []
+
+            day_night = []
+            int_ext = []
+
             img = self.images[run_num]
 
             key_index = 0
@@ -74,22 +81,23 @@ class SceneSlicer:
                         i * 2) + scene_start >= self.scene_keys[key_index + 1]:
                     key_index += 1
                 curr_time = self.scene_keys[key_index]
-                day_slices.append(i) if self.scene_desc[curr_time][
-                    IS_DAY] else night_slices.append(i)
-                int_slices.append(i) if self.scene_desc[curr_time][
-                    IS_INT] else ext_slices.append(i)
-            self.scene_slices[run_num] = (day_slices, night_slices, int_slices,
-                                          ext_slices)
+                day_night.append(0) if self.scene_desc[curr_time][
+                    IS_DAY] else day_night.append(1)
+                int_ext.append(0) if self.scene_desc[curr_time][
+                    IS_INT] else int_ext.append(1)
+            print len(day_night)
+            print len(int_ext)
+            self.scene_slices[run_num] = (day_night, int_ext)
         return self.scene_slices[run_num]
 
     def get_day_night(self, run_num, slice):
         if not self.scene_slices[run_num]:
             self.get_scene_slices(run_num)
         scene_slices = self.scene_slices[run_num]
-        is_day_slice = slice in scene_slices[DAY_IND]
-        is_int_slice = slice in scene_slices[INT_IND]
+        is_day_slice = scene_slices[DAY_NIGHT_IND][slice] == 0
+        is_int_slice = scene_slices[INT_EXT_IND][slice] == 0
         return (is_day_slice, is_int_slice)
 
 
 ss = SceneSlicer(path_to_images)
-print ss.get_day_night(0, 500)
+print ss.get_scene_slices(0)
