@@ -1,31 +1,40 @@
 # Python 3 compatibility
-from __future__ import absolute_import, division, print_function
+from __future__ import division, print_function
 import numpy as np
 import matplotlib.pyplot as plt
 import numpy.linalg as npl
 from scipy.stats import t as t_dist
 from scipy.ndimage import gaussian_filter
-import scene_slicer
+import scene_slicer as ssm
 import plot
+import nibabel as nib
 
-
-def get_design_matrix(data):
+def get_design_matrix():
     """
     Returns
     -------
     Design matrix with 5 columns, including the 3 columns of interest,
     the linear drift column, and the column of ones
     """
+    data = nib.load('test_data.nii')
     n_trs = data.shape[-1]
-    X = np.ones((n_trs, 5))
-    ss = scene_slicer(data,'scenes.csv')
-    day, night, inter, exter = ss.get_scene_slices(0) # run over all runs
-    X[:, 0] = day
-    X[:, 1] = inter
-    X[:, 2] = pos
-    X[:, 3] = np.linspace(-1, 1, n_trs)
+    X = np.ones((n_trs, 4))
+    ss = ssm.SceneSlicer('test_data.nii','scenes.csv') 
+    day_night, int_ext = ss.get_scene_slices()
+    X[:, 0] = day_night
+    X[:, 1] = int_ext
+    # X[:, 2] = pos
+    X[:, 2] = np.linspace(-1, 1, n_trs)
+
     return X
 
+def get_rf_design_matrix(voxels,data):
+    ss = ssm.SceneSlicer('test_data.nii','scenes.csv')     
+    day_night, int_ext = ss.get_scene_slices()
+    new_X = np.zeros((data.shape[-1],len(voxels)))
+    for num in range(len(voxels)):
+        new_X[:,num] = data[voxels[num]]
+    return new_X,day_night
 
 def plot_design_matrix(X):
     """
@@ -36,15 +45,21 @@ def plot_design_matrix(X):
     plt.imshow(X, aspect=0.1, cmap='gray', interpolation='nearest')
 
 
-def get_betas(X, data):
+def get_betas_Y(X, data):
     """
     Returns
     -------
     B: 2D array, p x B, the number of voxels
     """
-    Y = np.reshape(data, (data.shape[-1], -1))
-    B = npl.pinv(X).dot(Y)
-    return B
+    print(data.shape[-1])
+    print(type(data))
+    # Y = np.reshape(data, (data.shape[-1], -1))
+    Y = np.reshape(data,(-1,data.shape[-1]))
+    print(Y.shape)
+    # B = npl.pinv(X).dot(Y)
+    B = npl.pinv(X).dot(Y.T)
+    print(B.shape)
+    return B,Y.T
 
 
 def get_betas_4d(B, data):
@@ -53,7 +68,8 @@ def get_betas_4d(B, data):
     -------
     4D array, beta for each voxel; need this format to plot
     """
-    return np.reshape(B, data.shape[:-1] + (-1,))
+    print(B.shape)
+    return np.reshape(B.T, data.shape[:-1] + (-1,))
 
 
 def plot_betas(b_vols, col):
@@ -68,7 +84,8 @@ def plot_betas(b_vols, col):
     """
     if col >= b_vols.shape[-1]:
 	    raise RuntimeError("Error: select a column between 0 and p")
-    plot.plot_central_slice(b_vols[..., col])
+    c = b_vols.shape[2]//2
+    plt.imshow(b_vols[:,:,c,col],cmap='gray',interpolation='nearest')
 
 
 def t_stat(y, X, c):
@@ -124,31 +141,60 @@ def get_ts(Y, X, c, data):
     return abs(t)
 
     
-def get_top_100(t,thresh=100/1108800):
-    """
-    Parameters
-    ----------
-    t: 1D array of t-statistics for each voxel
+#def get_top_100(t,thresh=100/1108800):
+#    """
+#    Parameters
+#    ----------
+#    t: 1D array of t-statistics for each voxel
+#
+#    Returns
+#    -------
+#    1D array of position of voxels in top 100 of t-statistics (all are 
+#    positive)
+#    """
+#    a = np.int32(round(len(t) * thresh))
+#    # top_100_voxels = np.argpartition(t, -a)[-a:]
+#    # problem: nans, try
+#    top_100_voxels = np.argpartition(~np.isnan(t),-1)[-a:]
+    
+#    return top_100_voxels
 
-    Returns
-    -------
-    1D array of position of voxels in top 100 of t-statistics (all are 
-    positive)
+
+#def  get_index_4d(top_100_voxels, data):
+#    """
+#    Returns
+#    -------
+#    Indices in terms of 4D array of each voxel in top 20% of t-statistics
+#    """
+#    shape = data[...,-1].shape
+#    axes = np.unravel_index(top_100_voxels, shape)
+#    return zip(axes[0], axes[1], axes[2]) # sequence too large, try n = 32
+
+# Solve the problem by using 32 for next two functions intead
+def get_top_32(t,thresh=100/1108800):                                          
+    """     
+    Parameters                                                                  
+    ----------                                                                 
+    t: 1D array of t-statistics for each voxel
+    
+    Returns                                                                     
+    -------                                                                     
+    1D array of position of voxels in top 32 of t-statistics (all are positive
     """
     a = np.int32(round(len(t) * thresh))
-    top_100_voxels = np.argpartition(t, -a)[-a:]
-    return top_100_voxels
+    top_32_voxels = np.argpartition(~np.isnan(t),-1)[-a:]              
+    return top_32_voxels                                                       
+										
 
-
-def  get_index_4d(top_100_voxels, shape):
+def  get_index_4d(top_32_voxels, data):
     """
     Returns
     -------
     Indices in terms of 4D array of each voxel in top 20% of t-statistics
-    """
-    axes = np.unravel_index(top_100_voxels, shape)
-    return zip(axes[0], axes[1], axes[2])
-
+    """                                                                         
+    shape = data[...,-1].shape	
+    axes = np.unravel_index(top_32_voxels,shape)
+    return zip(axes[0],axes[1],axes[2])
 
 def plot_single_voxel(data, top_100_voxels):
     """
@@ -157,3 +203,63 @@ def plot_single_voxel(data, top_100_voxels):
     Nothing
     """
     plt.plot(data[get_index_4d(data, top_100_voxels)[0]])
+# fix so only get top voxel
+
+def get_train_day(X):
+    """
+    Parameters
+    ----------
+    X: design matrix
+    
+    Returns
+    -------
+    random 80% indices for day slices
+    """
+    index_day = np.where(X[:,0]==1)
+    return np.random.choice(index_day,size = len(index_day)*.8,
+			replace=FALSE)
+
+    
+def get_train_night(X):
+    """
+    Parameters
+    ----------
+    X: design maxtrix
+    
+    Returns
+    -------
+    random 80% indices for night slices (1D)
+    """
+    index_night = np.where(X[:,0]==1)
+    train = np.random.choice(index_night,size = len(index_night)*.8,
+		    replace = FALSE)
+    mask = np.ones(len(index_night),dtype=bool)
+    mask=False
+    test = index_night[mask] # not working
+
+    index_array = np.arange(len(index))
+    return train, test
+
+def get_train_test(X):
+    index_array = np.arange(X.shape[0])
+    np.random.shuffle(index_array)
+    eighty = int(X.shape[0] * 0.8)
+    train = X[:eighty]
+    test = X[eighty:]
+    return (train,test)
+
+def get_train_matrix(data,voxels,index_day_pred,index_night_pred):
+    """
+    Parameters
+    ----------
+    voxels: tuple or list, 3D
+    """
+    voxels = get_index_4d(voxels)
+    a = index_day_pred + index_night_pred
+    data = data[voxels,a]
+    actual = np.zeros(len(a))
+    actual[index_day_pred] = 1
+    return data, actual
+
+
+#if __name__ == "__main__":                                                          import doctest                                                                  doctest.testmod() 
