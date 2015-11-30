@@ -1,8 +1,10 @@
 import csv
-from textblob import TextBlob
+import textblob as tb
 from math import ceil, floor
+import unicodedata
 
 path_to_scene_csv = "../../ds113_study_description/stimulus/task001/annotations/german_audio_description.csv"
+
 
 def get_polarity_dict(filename):
     with open(filename, 'rt') as csvfile:
@@ -12,10 +14,15 @@ def get_polarity_dict(filename):
         for row in reader:
             start = ceil(float(row['start']))
             end = floor(float(row['end']))
-            blob = TextBlob(row['german_desc'])
-            print row['german_desc']
-            translated_blob = blob.translate(to="en")
-            sentiment = get_sentiment(blob)
+            desc = row['german_desc']
+            desc = unicode(desc, "utf-8")
+            desc = unicodedata.normalize('NFKD', desc).encode('ascii', 'ignore')
+            blob = tb.TextBlob(desc)
+            try:
+                translated_blob = blob.translate(from_lang="de", to="en")
+            except tb.exceptions.NotTranslated:
+                pass
+            sentiment = get_sentiment(translated_blob)
             print sentiment
 
 def get_sentiment(blob):
@@ -29,18 +36,3 @@ def get_sentiment(blob):
 
 
 get_polarity_dict(path_to_scene_csv)
-
-phrase = "Eine Computeranimation: Auf einen schroffen Berg mit schneebedeckter Flanke fliegt eine Reihe Sterne zu. Sie bilden einen Kranz um den Gipfel: 'Paramount'."
-# phrase = "you are ugly"
-
-
-blob = TextBlob(phrase)
-print blob.tags
-print blob.noun_phrases
-for sentence in blob.sentences:
-    print(sentence.sentiment.polarity)
-
-print blob.translate(to="en")
-
-for sentence in blob.sentences:
-    print(sentence.sentiment.polarity)
