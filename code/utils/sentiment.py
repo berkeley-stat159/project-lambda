@@ -23,7 +23,6 @@ def get_polarity_dict(filename):
             except tb.exceptions.NotTranslated:
                 pass
             sentiment = get_sentiment(translated_blob)
-            print sentiment
 
 def get_sentiment(blob):
     sentences = blob.sentences
