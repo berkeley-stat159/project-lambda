@@ -9,11 +9,11 @@ NIGHT_IND = 1
 INT_IND = 2
 EXT_IND = 3
 
-# with open('../../data/data_path.json', 'r') as fh:
-#     data_paths = json.load(fh)
-# path_to_images = []
-# for i in range(8):
-#     path_to_images.append("../../" + data_paths['bold_dico_7Tad2grpbold7Tad']['sub1']['runs'][0]['path'])
+with open('../../data/data_path.json', 'r') as fh:
+    data_paths = json.load(fh)
+path_to_images = []
+for i in range(8):
+    path_to_images.append("../../" + data_paths['bold_dico_7Tad2grpbold7Tad']['sub1']['runs'][0]['path'])
 
 
 class SceneSlicer:
@@ -89,3 +89,7 @@ class SceneSlicer:
         is_day_slice = slice in scene_slices[DAY_IND]
         is_int_slice = slice in scene_slices[INT_IND]
         return (is_day_slice, is_int_slice)
+
+
+ss = SceneSlicer(path_to_images)
+print ss.get_day_night(0, 500)

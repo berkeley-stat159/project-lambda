@@ -1,21 +1,22 @@
-import nltk
 import csv
 from textblob import TextBlob
+from math import ceil, floor
 
 path_to_scene_csv = "../../ds113_study_description/stimulus/task001/annotations/german_audio_description.csv"
 
 def get_polarity_dict(filename):
-  with open(filename, 'rt') as csvfile:
-    reader = csv.DictReader(
-        csvfile,
-        fieldnames=['start', 'end', 'german_desc'])
-    for row in reader:
-        start = float(row['start'])
-        end = float(row['end'])
-        blob = TextBlob(row['german_desc'])
-        translated_blob = blob.translate(to="en")
-        sentiment = get_sentiment(blob)
-        print sentiment
+    with open(filename, 'rt') as csvfile:
+        reader = csv.DictReader(
+            csvfile,
+            fieldnames=['start', 'end', 'german_desc'])
+        for row in reader:
+            start = ceil(float(row['start']))
+            end = floor(float(row['end']))
+            blob = TextBlob(row['german_desc'])
+            print row['german_desc']
+            translated_blob = blob.translate(to="en")
+            sentiment = get_sentiment(blob)
+            print sentiment
 
 def get_sentiment(blob):
     sentences = blob.sentences
@@ -27,10 +28,10 @@ def get_sentiment(blob):
 
 
 
-# get_polarity_dict(path_to_scene_csv)
+get_polarity_dict(path_to_scene_csv)
 
-# phrase = "Eine Computeranimation: Auf einen schroffen Berg mit schneebedeckter Flanke fliegt eine Reihe Sterne zu. Sie bilden einen Kranz um den Gipfel: 'Paramount'."
-phrase = "you are ugly"
+phrase = "Eine Computeranimation: Auf einen schroffen Berg mit schneebedeckter Flanke fliegt eine Reihe Sterne zu. Sie bilden einen Kranz um den Gipfel: 'Paramount'."
+# phrase = "you are ugly"
 
 
 blob = TextBlob(phrase)
