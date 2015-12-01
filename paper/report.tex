@@ -163,8 +163,8 @@ STAT159\_CACHED\_DATA, the default behavior is to use cached files. Enabling
 the user to easily choose whether or not to recompute intermediary data files
 is consistent with the reproducible paradigm this course emphasizes.
 
-<The results for this portion of our paper are still being computed, will
-<include in final draft>
+The results for this portion of our paper are still being computed, and be will
+include in final draft.
 
 \subsection{Extracting Data} We will not be using all of the data. The data
 files are very large: for each subject, the download size is approximately 16
@@ -190,6 +190,10 @@ model the noise created by linear drift.  This subject moved backwards and to
 the left, but the data does look quite messy.  It appears as though the fMRI
 is picking up signal from outside the subject’s head.
 
+\begin{center}
+\includegraphics[height=8cm]{1}
+\end{center}
+
 We will be only working with the first subject for now for testing purposes,
 but if time had allowed, we would have ran our code on a couple of other
 subjects for comparison testing. And to ensure speedy access to other
@@ -199,6 +203,136 @@ then locally transferring the remaining three-quarters of the data from our
 hard drives.  However, we did find the data online at studyforrest.org, which
 allowed us to only download the files we needed, as opposed to the entire
 datafile for each subject.
+
+\subsection{Exploration of Data}
+
+After perusing all the stimulus related data
+(e.g. data annotating each Forest Gump scene and when a subject was exposed to
+that scene), we decided to guide part of our analysis to see if we could
+summarize any interesting trends in fMRI response with respect to these
+features. Additionally, by investigating a single subject for our initial
+analysis  and using the nonlinearly aligned transformed data, we have limited
+our project’s scope to approximately 5 gigabytes from the roughly 320
+gigabytes that were published with the paper. With the data reduced to a
+manageable state, we have successfully overcome this obstacle. Finally, by
+introducing a data\_path.json file to reference where each raw data file is
+located, we have designed a clean schema for our python scripts to find and
+load data in the project repository.
+
+We deviated from the original data analysis in our reproduction. The paper
+used the raw data which varied largely with every subject, and processed that
+by standardizing among twenty of them with both linear alignments and non-
+linear alignments. We decided that we would just use the already processed
+nonlinearly aligned data since they already provided it, and we would not be
+able to do it as well as them.
+
+Our initial plan was to first just conduct some basic exploratory data
+analysis and then further delve into the findings that strike us as intriguing
+or unusual. We began by writing functions that loaded the .nii files for each
+subject and calculated and plotted the standard deviations across voxels.
+After exploring the files provided by Hanke et al., we saw that there exists a
+csv file of the scenes in the movie with a time-stamp, a brief scene
+description, whether it takes place in day or night, and if it is inside or
+outside, as mentioned in the Data section.
+
+We used this information and the fMRI data to select features with the goal of
+building the best possible predictor of certain aspects of a movie scene given
+fMRI data. We wanted to be able to accurately predict whether a particular
+movie scene falls under one of two categories for two separate groups, day or
+night, and inside or outside.  Our plan of action was to 1) select voxels that
+seemed to differ most between the two groups as features, and 2) use machine
+learning to classify slices under one of two groups.
+
+We began with the analysis for differentiating day and night slices, but this
+analysis can easily be applied to address the question of which voxels pick up
+on the difference between interior and exterior slices.  We can then use
+machine learning to predict which slices are interior and which are exterior.
+
+To select voxels as features for our classification problem, we first
+determined which slices took place during the day and which took place during
+the night, which were inside and which were outside.  In order to account for
+baseline BOLD and any linear drift created by the subject moving in the
+scanner, we created a design matrix.  The design matrix currently includes 4
+columns: a column for day vs. night, a column for interior vs. exterior, a
+column for linear drift, and a column of ones for the intercept.
+
+\begin{center}
+\includegraphics[height=8cm]{2}
+\end{center}
+
+The figure above shows the design Matrix, including day vs. night, interior vs. exterior, linear drift, and a column of ones
+
+We then performed a t-test for each voxel to determine if the signal is
+significantly different between each of the two groups we were comparing.
+This gave us an array of t-statistics, one for each voxel, a total of 1108800,
+as well as an array of betas, telling us the effect size.  Since we wanted to
+pick out the voxels with the biggest change between groups, we cut down that
+number by selecting the top portion of them.  This number of feature
+selections is rather arbitrary, but should be relatively small so we can
+create a random forest with it that does not overfit.  Part of our analysis is
+determining the optimal number of features to select. This will be done via
+cross validation.
+
+\begin{center}
+\includegraphics[height=8cm]{3}
+\end{center}
+
+The figure above is the largest 32 t-statistics.
+
+The time course for the voxel with the highest t-statistic looks very noisy.
+We can compare it to the stimulus (day) time course, but there is no obvious
+relationship.
+
+
+\begin{center}
+\includegraphics[height=8cm]{4}
+\end{center}
+
+The figure is the time course for the voxel with the highest t-statistic.
+
+\begin{center}
+\includegraphics[height=8cm]{5}
+\end{center}
+
+The fiture is the day-night time course for Task 1, Run 1.  Very few scenes
+take place at night for this run.
+
+Because we are ultimately interested in feature selection, not in whether
+certain voxels are significantly different between the two groups, we did not
+correct for multiple comparisons.  If we were interested in the significance
+of certain voxels, we would apply a Bonferroni correction.
+
+We wanted to know which areas of the brain seemed to be most inclined to pick
+up on the difference between day and night.  Thus, we plotted the betas
+testing the hypothesis that there is no difference between day and night for
+each voxel.  Unfortunately, this looks very similar to our linear drift image,
+where there appears to be an artifact.
+
+\begin{center}
+\includegraphics[height=8cm]{7}
+\end{center}
+
+We can also apply this to the question of whether we can tell the difference
+between positive, negative, and neutral scenes by examining certain voxels in
+the brain. Unlike the scenes data, which we can only code as day, night,
+interior, or exterior, since that is all the information we have, since we are
+extrapolating the sentiment of the scene from the scenes descriptions
+ourselves and sentiments can vary along a spectrum from very positive to very
+negative, we can perform a linear regression with sentiments.  We only coded
+the sentiment for scenes in which a narrator was speaking, and only the time
+in which he was speaking.
+
+To see if we could predict whether a slice was taken from a day or night
+scene, we focused on creating a random forest, using voxels selected as the
+features as the nodes.  We first trained on a random 80\% of the slices,
+collapsing day slices and night slices together, so that the distribution of
+the slices selected was roughly equivalent to the distribution of the entire
+data, rather than selecting 80\% of the day slices and 80\% of the night
+slices.  The other 20\% of the slices we preserved to be our testing set.  We
+created a decision tree, which we used to predict whether each slice in the
+testing set took place during the day or the night.  In theory, we could use
+the first six runs as the training set, and see how well they predict the last
+two runs for a given participant.
 
 
 \subsection{Analysis} After perusing all the stimulus related data (e.g. data
@@ -255,6 +389,10 @@ that plot a slice of the brain at any given time and the standard deviations
 across voxels for individual subjects using Matlibplot. This enabled us, at a
 quick glance, to gauge the variability of the fMRI data.
 
+\begin{center}
+\includegraphics[height=8cm]{7}
+\end{center}
+
 It takes a few minutes to calculate the standard deviation for each volume in
 the 4-D array for Subject 1’s Task 1, Run 1. This makes sense, as the 4-D
 array is (132, 175, 48, 451) in dimension; this means we are calculating and
@@ -263,7 +401,12 @@ that for this particular run and task, the standard deviations across all 451
 points is within 171 and 173.5. Though this range may seem small, from the
 plot we can see that there is quite of variability within that range of 2.5.
 One possible explanation for this is the varying responses to different movie
-scenes. Some scenes will evoke different
+scenes. Some scenes will evoke different reactions and thus different values
+per voxels.
+
+\begin{center}
+\includegraphics[height=8cm]{8}
+\end{center}
 
 One initial direction we had hoped to explore was possible differences in
 physiological responses to certain movie scenes by gender and age. However, we
@@ -323,61 +466,6 @@ The decision tree we created had a prediction accuracy of 83.5\%.  However,
 worse than chance.
 
 \section{Discussion}
-
-\subsection{Strengths}
-
-Making our project reproducible is
-among our strengths. Our team has a firm understanding of command line and
-python scripts, along with the importance of grouping common behavior in
-general functions, such as not merging new functions into master unless those
-functions are unit tested, to ensure that a) functions work according to
-specified behavior and b) future changes do not break functions that had been
-working.
-
-Learning how to work with the data in class was helpful because we have never
-worked with images in that type of format. We were not familiar with libraries
-like nibabel and thus it was very helpful to see how we could use them in our
-analyses. Exercises working with other fMRI data and various calculations we
-could perform on them was informative and relevant.
-
-
-\subsection{Obstacles}
-
-The main objective of the original study and paper was to gather raw data,
-mostly for other researchers to use in their own studies. Consequently, we
-were not given much direction in terms of what analyses we should initially
-conduct or reproduce. Also, as previously mentioned, the sheer amount of data
-we have to work with is almost overwhelming, especially given our limited
-computing resources. However, we assuaged this issue by using external hard
-drives to transfer data among group members.
-
-We have differing prior experiences with Github and with research.  Those who
-have more experience with git and Github help those who have less experience
-set up repos and push and pull correctly.  Finding a method of communication
-was another issue we initially faced: we have been communicating via Facebook,
-and switching to communicate on Github to directly reference code has been
-difficult.  As a result, many issues on Github and pull requests have not been
-seen by other members.  We have addressed this issue by reminding one another
-to look at pull requests on Facebook. We have varying areas of expertise, such
-as code review and statistical analysis, but we have used that to our
-advantage by having group members work on their areas of expertise.
-
-Understanding the data - specifically in terms distinguishing the several
-forms of normalized data - and what conclusions we can draw is difficult, but
-we understand that that is beyond the scope of our project. Although our main
-goal is to become familiar with reproducibility and collaboration via the
-software tools taught in class, feeling shaky on understanding the statistical
-meaning of our results is disconcerting. For example, a deeper understanding
-of time series would enable us to perform stronger statistical techniques.
-
-To successfully complete our project we need to keep the data we use well
-structured and organized, perform insightfully and interpretable exploratory
-data analysis, and perform hypothesis tests referencing Forest Gump scene
-features (although these tests are not expected to indicate causal
-inferences). Finally success also depends on doing these items in a
-reproducible and collaborative manner. We must strive to automate our analysis
-routines through command line interfaces and exploit the modern git and github
-workflow.
 
 \subsection{Potential Future Studies}
 
