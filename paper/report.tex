@@ -1,10 +1,10 @@
 \documentclass[11pt]{article}
 
 \usepackage[margin=0.75in]{geometry}
+\usepackage{graphicx}
+\graphicspath{ {images/} }
 
-\title{
-fMRI Dataset from Complex Natural Stimulation with Forrest Gump: A Restudy
-}
+\title{fMRI Dataset from Complex Natural Simulation with Forrest Gump: A Restudy}
 \author{
   Chang, Jordeen\\
   \texttt{jodreen}
@@ -24,28 +24,31 @@ fMRI Dataset from Complex Natural Stimulation with Forrest Gump: A Restudy
 \begin{document}
 \maketitle
 
-\abstract{Most fMRI studies use highly simplified stimulus that are vastly
-dissimilar from what people experience in everyday life. This study sought to
-create a dataset of naturally occurring brain states by exposing participants
-to a more complex stimulus, the audio description of Forrest Gump. This
-particular audio description allows for the study of auditory attention and
-cognition, language and music perception, and retrieval of explicit memory
-without the effect of visual imagery. In addition, this dataset uses inter-
-individual synchronicity to study responses to complex processing. Originally,
-representational similarity analysis was used to identify similar patterns
-across brains.}
+\abstract{Most fMRI studies use highly simplified stimulus that are very
+different from what people experience in everyday life. “A High-Resolution 7-
+Tesla fMRI Dataset from Complex Natural Stimulation with an Audio Movie” by
+Hanke et. al. sought to create a dataset of naturally occurring brain states
+by exposing participants to a more complex stimulus, the audio description of
+Forrest Gump. This particular audio description allows for the study of
+auditory attention and cognition, language and music perception, and retrieval
+of explicit memory without the effect of visual imagery. Furthermore, the
+study was conducted on 20 subjects enabling research into brain similarities
+among individuals when exposed to the same complex stimulus. The goal of our
+paper is to first reproduce a subset of the analysis conducted by Hanke et.
+al, then apply machine learning to see if we can predict if a subject was
+listening to a day or night scene of the movie based on brain state.}
 
 \section{Introduction}
 
 The main purpose of the original study was to examine properties of brain
 response patterns that are supposedly common when people are exposed to audio
-and movie stimulation. We intend to replicate their experiment using the data
+and movie simulation. We intend to replicate their experiment using the data
 they gathered from the 20 participants. For example, a BOLD time-series
 similarity measure (e.g. correlation) is often used to quantify similarities
-in responses among individuals. Hanke et al. recognized that this was a common
+in responses among individuals. Hank et al. recognized that this was a common
 approach, but they went beyond that and also implemented representational
-similarity analysis (RSA). To do so, we will create dissimilarity matrices for
-18 individuals using the same searchlight mapping approach that they used
+similarity analysis  (RSA). To do so, we will create dissimilarity matrices
+for 18 individuals using the same searchlight mapping approach that they used
 (Subjects 4 and 10 were not included due to missing data). Doing so will
 capture 2nd-order isomorphisms in response patterns. Lastly, to access
 statistical significance, we will transform the representational consistency
@@ -54,25 +57,38 @@ correlations. We'll calculate the mean correlation coefficient and compare our
 value to theirs.
 
 Before we formally began, we performed basic sanity checks on the data. We
-have downloaded and loaded the files successfully, and we have confirmed that
-we have data for a test subject. Reproducibility is crucial in research,
-especially when such high volumes of data are involved, because it allows
-other people to fact check the work. When people collaborate, new insights can
-be shed and the rate of progress is expedited. For this study, we will begin
-by extracting data we see fitting, and proposing interesting questions that we
-will attempt to answer.
-
-Identify a published fMRI paper and the accompanying data
+downloaded and loaded the files successfully, and we have confirmed that we
+have data for every test subject. Because there were various versions of the
+data (e.g. linear vs. nonlinear), we had to first isolate which dataset best
+suited our needs. The nonlinear alignment had more smoothing than the linear
+alignment, which made that dataset more appropriate for initial exploratory
+data analysis.  We recognize that the nonlinear alignment is crude, since it
+probably was conducted with no specific hypothesis about which parts of the
+brain should be expanded or compressed, but not having the machinery or
+background to better preprocess the data, we simply used the nonlinear
+alignment version of the data provided by Hanke et al
 \cite{hank2014audiomovie}.
+
+Reproducibility is crucial in research, especially when such high volumes of
+data are involved, because it allows other people to fact check the work. When
+people collaborate, new insights can be shed and the rate of progress is
+expedited. For this study, we began by extracting data we see fitting and
+asking questions that were not addressed by the original study. To answer
+these questions, we utilized neuroscience concepts, additional packages, and
+parallel processing techniques. We found that in certain functions, such as
+parsing through csv files, it would have been easier to hard code in the
+correct values. However, hard coding would have defeated the reproducibility
+aspect of our study because our code would break if the data were slightly
+modified.
 
 \section{Data}
 
 The data is curated and segmented into 20 .TGZ files, where each of the 20
-.TGZ files corresponds to one of the 20 subjects in the experiment. Each
-subject accounts for approximately 16 GBs of data. We verified the usability
+.TGZ  files corresponds to one of the 20 subjects in the experiment. Each
+subject  accounts for approximately 16 GBs of data. We verified the usability
 of the data by inspecting and loading data corresponding to subject 1. We
-limited our initial exploration to a single subject since downloading each
-.TGZ takes approximately one hour. The download for each subject includes a
+limited our  initial exploration to a single subject since downloading each
+.TGZ takes  approximately one hour.  The download for each subject includes a
 lot of other information besides just the fMRI data, such as cardiac and
 respiratory trace, angiographies, and structural MRI data. Each subject's fMRI
 data includes several formats: Raw BOLD functional MRI, Raw BOLD functional
@@ -82,34 +98,114 @@ alignment). The corrected and aligned versions of the data attempt to
 eliminate device and scan related noise. Scan data is accessible in nibabel
 compatible formats (.NII).
 
+In addition to fMRI data for each subject, there was also data about the
+experiment as a whole, including a German audio description of the stimulus
+and a csv file with scene information, including the timestamp of the
+beginning of each scene, the scene location, whether the scene took place
+during the day or night, and whether the scene was inside or outside.
+
 \section{Methods}
 
-\subsection{Extracting Data}
+\subsection{Reproduction} A central theme of the course is exploring
+reproducible practices while conducting scientific research. For our project
+we address reproducibility from two perspectives: first, we designed our code
+and scripts to be modular and portable so that anyone with an appropriate
+computer can rerun our analysis and reproduce the results we cite in this
+paper. Second, we attempted to reproduce some of the results cited in the
+original paper by emulating Hanke’s technique and comparing values. This
+section addresses how we tried to reproduce Hanke’s analysis, challenges we
+faced, and how our results match up.
 
-We will not be using all of the data. The data
+The original paper focused on inter-individual response pattern similarity. In
+other words, their analysis measures brain pattern correlation between
+subjects who listened to Forrest Gump. Hanke identifies two methods for
+measuring correlation. The first method takes the BOLD time-series and
+calculates the voxel-wise pearson correlation and second method employs
+“representational similarity analysis to identify 2nd-order isomorphisms in
+the response patterns across brains.” Since the first technique is simpler, we
+chose that to be the portion of the analysis we tried to reproduce. Although
+20 subjects were scanned, Hanke excluded subjects 4 and 10 from the paper
+since data was missing. With the 18 remaining subjects there are 153 pairs (18
+choose 2) for which voxel-wise correlations are calculated. Hanke calculated
+correlations on linearly and nonlinearly aligned raw data. Instead of using
+the paper’s raw data, which was applied through a bandpass filter, we used a
+version of the raw data provided by Matthew Brett which was non-linearly
+aligned and applied through a highpass filter.
+
+The main challenge in reproducing the paper’s analysis resides in the large
+amount of data that must be processed. Since subjects were scanned at 7 tesla,
+the brain images have a very high resolution, and therefore are large. The
+full two hour scan for each subject is approximately 7.5 GBs, meaning 153
+pairs of 2 x 7.5 GB files must be processed. A seemingly trivial calculation
+of computing correlations between a set of voxels is difficult at this paper’s
+scale. On an Intel core i7 (1.7 GHz) machine with 8 GBs of RAM, preprocessing
+(concatenating runs and converting the 4D image to 2D) takes approximately 30
+minutes per subject. Calculating the correlations between a pair of subjects
+takes 10 minutes (8 minutes to load both subjects time courses into memory and
+2 minutes to calculate the pearson correlations for all the voxels).  To
+combat these concerns, we used python’s multiprocessing module to parallelize
+the reshaping of 4D to 2D arrays in the preprocessing step and parallelize the
+calculating of correlations between subjects. Additionally, we ran our
+analysis on Amazon EC2 instances with memory capacities large enough to fully
+load both two hour time courses for each subject in the pair being considered.
+By renting multiple EC2 instances, we are able to parallelize the
+preprocessing work enabling multiple subjects to be preprocessed once.
+
+Since rerunning our preprocessing and correlation code may take several hours
+depending on one’s machine, we defined a UNIX environment variable called
+STAT159\_CACHED\_DATA. If this variable is set to ‘True’, then our python
+scripts will look to see if preprocessed versions of the data exist in the
+/data/processed directory and use those instead of recomputing them. If
+however one wants to fully recompute everything, merely setting
+STAT159\_CACHED\_DATA to ‘False’ will ensure that all python scripts do not
+use data files that have already been computing. If the user does not specify
+STAT159\_CACHED\_DATA, the default behavior is to use cached files. Enabling
+the user to easily choose whether or not to recompute intermediary data files
+is consistent with the reproducible paradigm this course emphasizes.
+
+<The results for this portion of our paper are still being computed, will
+<include in final draft>
+
+\subsection{Extracting Data} We will not be using all of the data. The data
 files are very large: for each subject, the download size is approximately 16
 GB, and that does not even include unzipping all the file inside. Given that
 we have twenty subjects, downloading all of this could be a paper in it of
-itself. Since the focus of this class is mainly fMRI data, we decided to
+itself. and since the focus of this class is mainly fMRI data, we decided to
 ignore everything else. However, the fMRI data is still not of a trivial size
-because three versions of the data are included: the raw data, the linear
+because three versions of the data is included: the raw data, the linear
 alignment, and the non-linear alignment. We will only be choosing one of them
 (the one linearly aligned) because using all of them would just be redundant.
 
+We smoothed the data before performing any analyses by applying a Gaussian
+filter.  This filter smooths the signal between adjacent voxels, addressing
+our assumption that adjacent voxels are not independent.  We recognize that
+this may be crude and perhaps counterproductive, since we want to pick out the
+voxels with the highest difference in signal between the two conditions, but
+we need to address our assumption, and smoothing is better than nothing.
+
+Hanke et al. preprocessed the data for us by creating an EPI group template.
+They aligned each image to the first image for each individual, then aligned
+all brains using FLIRT.  However, we thought it would still be a good idea to
+model the noise created by linear drift.  This subject moved backwards and to
+the left, but the data does look quite messy.  It appears as though the fMRI
+is picking up signal from outside the subject’s head.
+
 We will be only working with the first subject for now for testing purposes,
-but if time allows, we will run our code on a couple of other subjects for
-comparison testing. And to ensure speedy access to other subjects' datasets,
-our strategy for getting all the data entails each group member downloading a
-different quarter of the overall dataset, and then locally transferring the
-remaining three-quarters of the data from our hard drives.
+but if time had allowed, we would have ran our code on a couple of other
+subjects for comparison testing. And to ensure speedy access to other
+subjects' datasets, our strategy for getting all the data entails each group
+member spending downloading a different quarter of the overall dataset, and
+then locally transferring the remaining three-quarters of the data from our
+hard drives.  However, we did find the data online at studyforrest.org, which
+allowed us to only download the files we needed, as opposed to the entire
+datafile for each subject.
 
-\subsection{Analysis}
 
-After perusing all the stimulus related data (e.g. data
+\subsection{Analysis} After perusing all the stimulus related data (e.g. data
 annotating each Forest Gump scene and when a subject was exposed to that
 scene), we decided to guide part of our analysis to see if we could summarize
 any interesting trends in fMRI response with respect to these features.
-Additionally, by investigating a single subject for our initial analysis and
+Additionally, by investigating a single subject for our initial analysis  and
 using the linearly aligned transformed data, we have limited our project’s
 scope to approximately 5 GBs from the roughly 320 GBs that were published with
 the paper. With the data reduced to a manageable state, we have successfully
@@ -120,11 +216,11 @@ for our python scripts to find and load data in the project repository.
 We are deviating from the original data analysis. The paper used the raw data
 which varied largely with every subject, and processed that by standardizing
 among twenty of them with both linear alignments and non-linear alignments. We
-decided that we would simply use the already processed linearly aligned data
+decided that we would just use the already processed linearly aligned data
 since they already provided it, and we would not be able to do it as well as
 them.
 
-Our initial plan is to first conduct basic exploratory data analysis
+Our initial plan is to first just conduct some basic exploratory data analysis
 and then further delve into the findings that strike us as intriguing or
 unusual. We began by writing functions that loaded the .nii files for each
 subject and calculated and plotted the standard deviations across voxels. From
@@ -142,37 +238,101 @@ After determining which points in time were during the day and which were
 during the night, and which were inside and which were outside, we can perform
 a t-test to determine if the signal is significantly different between each of
 the two groups for each voxel.  We will perform a multiple comparisons test to
-correct for the number of t-tests we will be running. We will also model
+correct for the number of t-tests we will be running.   We will also model
 each of those voxels that are statistically significant to see what their time
 courses look like.
 
 We have a few ideas as to what questions to ask, but are in the process of
-looking at other ideas. There is an entire website dedicated to studying this
+looking at other ideas.  There is an entire website dedicated to studying this
 dataset, studyforrest.org, and we are researching to see what other people
 have done.
 
 
 \section{Results}
 
-So far, we have written functions that plot the standard
-deviations across voxels for individual subjects using Matlibplot. In
-addition, we also plan on exploring possible differences in physiological
-responses to certain movie scenes by gender and age. Given that we would have
-to comb through around 16 GB worth of data just for each subject, we will
-initially narrow our analysis to just one representative from each group (e.g.
-one female and one male). And if time permits, we will run the our analysis on
-all 20 subjects (e.g. 8 females and 12 males).
+We began our exploratory data analysis by writing functions
+that plot a slice of the brain at any given time and the standard deviations
+across voxels for individual subjects using Matlibplot. This enabled us, at a
+quick glance, to gauge the variability of the fMRI data.
 
+It takes a few minutes to calculate the standard deviation for each volume in
+the 4-D array for Subject 1’s Task 1, Run 1. This makes sense, as the 4-D
+array is (132, 175, 48, 451) in dimension; this means we are calculating and
+plotting 451 standard deviations in total. From the plot above, we can see
+that for this particular run and task, the standard deviations across all 451
+points is within 171 and 173.5. Though this range may seem small, from the
+plot we can see that there is quite of variability within that range of 2.5.
+One possible explanation for this is the varying responses to different movie
+scenes. Some scenes will evoke different
+
+One initial direction we had hoped to explore was possible differences in
+physiological responses to certain movie scenes by gender and age. However, we
+later had to forgo this idea because doing so required us to process and
+analyze the entire dataset, something that we could not efficiently do given
+our limited computing resources. To be more specific, we would have had to
+comb through around 16 gigabytes worth of data just for one subject. Though
+these were certainly interesting questions, their focus was too broad for us
+to be able to fully address them.
+
+So, in order to glean anything remotely useful, we had to narrow down our
+focus. There are 20 subjects with 8 runs each. We limited our initial analysis
+to just one run for one subject in order to conduct hypothesis tests. And
+after parsing the two csv files (scenes.csv and demographics.csv), we then had
+limited data about the movie scenes and personnel about each subject. We
+implemented “Scene Slicer” and “Subject” classes with attributes that were
+unique to each scene or subject.
+
+For the Scene Slicer object, its attributes were:
+\begin{enumerate}
+\item path\_to\_scene\_csv: a string that is the absolute path to scene.csv
+\item image: the image loaded from the .nii data
+\item scene\_slices: a list of the scene slices
+\item segment\_duration: a list containing the time duration of each movie
+slice
+\item scene\_desc: a dictionary mapping the start of the scene time to tuple
+of day or night and interior or exterior
+\item scene\_keys: a sorted list of keys from the scene\_desc dictionary
+\end{enumerate}
+
+For a Subject object, it has the attributes:
+
+\begin{enumerate}
+\item id: an integer that identifies the subject and is unique to each
+subject, ranging from 1 to 20
+\item gender: a string, either ‘m’ or ‘f’, that denotes the subject’s gender
+\item age\_range: a string that denotes the age range of the subject
+\item forrest\_seen\_count: an integer that denotes how many times the subject
+has seen Forrest Gump prior to the study
+\end{enumerate}
+
+Out of the 451 recorded instances of whether a scene was day or night for
+Subject 1 and Task 1, Forrest Gump had 390 day slices and 61 night slices and
+296 interior slices and 155 exterior slices. Subject 1 is a male who is 30-35
+years old and had seen the movie 5 times prior to the study.
+
+Though there were much more data in the demographics.csv file than the
+attributes given to a Subject object, we had deemed those data to be
+irrelevant for our purposes. For example, there were also data about each
+subject’s music preferences and languages spoken. As we suggested before,
+there were a lot of directions that we could have taken with all this data,
+but these directions were too general and broad for us to be able to use them
+in conjunction with the fMRI data to do any conclusive studies.
+
+The decision tree we created had a prediction accuracy of 83.5\%.  However,
+86.5\% of slices took place during the day, so this first tree is performing
+worse than chance.
 
 \section{Discussion}
+
 \subsection{Strengths}
 
-Making our project reproducible is among our strengths. Our team has a firm
-understanding of command line and python scripts, along with the importance of
-grouping common behavior in general functions, such as not merging new
-functions into master unless those functions are unit tested, to ensure that
-a) functions work according to specified behavior and b) future changes do not
-break functions that had been working.
+Making our project reproducible is
+among our strengths. Our team has a firm understanding of command line and
+python scripts, along with the importance of grouping common behavior in
+general functions, such as not merging new functions into master unless those
+functions are unit tested, to ensure that a) functions work according to
+specified behavior and b) future changes do not break functions that had been
+working.
 
 Learning how to work with the data in class was helpful because we have never
 worked with images in that type of format. We were not familiar with libraries
@@ -218,6 +378,21 @@ inferences). Finally success also depends on doing these items in a
 reproducible and collaborative manner. We must strive to automate our analysis
 routines through command line interfaces and exploit the modern git and github
 workflow.
+
+\subsection{Potential Future Studies}
+
+Since the 20 participants have differing
+amounts of exposure to Forrest Gump, with some participants having never seen
+the movie before and one participant who had seen the movie twelve times
+before, a future study could examine the difference in voxel activation
+between participants who had never seen the movie before and those with high
+amounts of exposure.
+
+Ideally, a future investigator could split the participants into a training
+set and testing set, and predict which participants have limited familiarity
+with the movie, defined as seeing the movie 2 or fewer times.  However, there
+are a relatively small number of participants, only 20, since fMRI is
+expensive, so the predictive ability of that study would be rather limited.
 
 
 \bibliography{project}
