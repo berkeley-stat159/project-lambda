@@ -18,16 +18,14 @@ def get_design_matrix():
     """
     data = nib.load('test_data.nii')
     n_trs = data.shape[-1]
-    X = np.ones((n_trs, 4))
+    X = np.ones((n_trs, 3))
     ss = ssm.SceneSlicer('test_data.nii','scenes.csv') 
     day_night, int_ext = ss.get_scene_slices()
-    X[:, 0] = day_night
-    X[:, 1] = int_ext
-    # X[:, 2] = pos
+    X[:, 1] = day_night
     X[:, 2] = np.linspace(-1, 1, n_trs)
-
     return X
 
+#design matrix that is passed into random forrest
 def get_rf_design_matrix(voxels,data):
     ss = ssm.SceneSlicer('test_data.nii','scenes.csv')     
     day_night, int_ext = ss.get_scene_slices()
@@ -43,6 +41,7 @@ def plot_design_matrix(X):
     None
     """
     plt.imshow(X, aspect=0.1, cmap='gray', interpolation='nearest')
+    plt.xticks([])
 
 
 def get_betas_Y(X, data):
@@ -119,25 +118,6 @@ def t_stat(y, X, c):
     # calculate bottom half of t statistic
     SE = np.sqrt(MRSS * c.T.dot(npl.pinv(X.T.dot(X)).dot(c)))
     t = c.T.dot(beta) / SE
-    return t
-
-
-def get_ts(Y, X, c, data):
-    """
-    Parameters
-    ----------
-    Y: TxB array, last axis of data
-    X: design matrix
-    c: contrast array
-
-    Returns
-    -------
-    t-statistic for each voxel
-    """
-    n_voxels = np.prod(data.shape[:-1])
-    t = np.zeros(n_voxels)
-    for num in range(n_voxels):
-        t[num] = t_stat(Y[:, num], X, c)
     return abs(t)
 
     
@@ -186,7 +166,7 @@ def get_top_32(t,thresh=100/1108800):
     return top_32_voxels                                                       
 										
 
-def  get_index_4d(top_32_voxels, data):
+def get_index_4d(top_32_voxels, data):
     """
     Returns
     -------
@@ -200,7 +180,7 @@ def plot_single_voxel(data, top_100_voxels):
     """
     Returns
     -------
-    Nothing
+    None
     """
     plt.plot(data[get_index_4d(data, top_100_voxels)[0]])
 # fix so only get top voxel
