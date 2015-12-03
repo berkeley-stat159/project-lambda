@@ -11,7 +11,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import numpy.linalg as npl
 from scipy.stats import t as t_dist
-from .. import scene_slicer, plot
 
 from .. import linear_modeling
 from numpy.testing import assert_almost_equal
@@ -65,8 +64,8 @@ def test_t_stat():
 
 def test_get_ts():
     actual = linear_modeling.get_ts(y, X, [0, 1], data)
-    expected = np.array([9.84892820e+14, 6.46867339e+14, -4.81391897e-01, -
-                         8.59684933e+14, -4.81391897e-01, 7.99631096e+14])
+    expected = np.array([  5.17025418e+14,   6.34398955e+14,   8.90932271e-01,
+	    6.54672386e+14,   8.90932271e-01,   5.55652284e+14])
     assert_almost_equal(actual, expected)
 
 
