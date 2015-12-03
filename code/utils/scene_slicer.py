@@ -11,6 +11,9 @@ IS_INT = 1
 DAY_NIGHT_IND = 0
 INT_EXT_IND = 1
 
+TUNING_SECONDS_OFFSET = 17
+TUNING_VOLUMES_OFFSET = 9
+
 # with open('../../data/data_path.json', 'r') as fh:
 #     data_paths = json.load(fh)
 # path_to_subject_image = "../../" + data_paths['bold_dico_7Tad2grpbold7Tad']['sub1']['runs'][0]['path']
@@ -34,10 +37,10 @@ class SceneSlicer:
                                                row['int-ext'] == "INT")
 
     def generate_scene_slices_(self):
-        day_night = least_int_great_than_(17 / 2) * [None]
-        int_ext = least_int_great_than_(17 / 2) * [None]
-        current_scene_start_time = 17
-        for i in range(9, self.image.shape[-1]):
+        day_night = least_int_great_than_(TUNING_SECONDS_OFFSET / 2) * [None]
+        int_ext = least_int_great_than_(TUNING_SECONDS_OFFSET / 2) * [None]
+        current_scene_start_time = TUNING_SECONDS_OFFSET
+        for i in range(TUNING_VOLUMES_OFFSET, self.image.shape[-1]):
             if i * 2 - 1 in self.scene_desc:
                 current_scene_start_time = i * 2 - 1
             elif i * 2 in self.scene_desc:
@@ -69,7 +72,7 @@ def convert_boolean_to_int_array_(array):
         if elem is None:
             converted_array.append(elem)
         else:
-            converted_array.append(elem + 0)
+            converted_array.append(int(elem))
     return converted_array
 
 
