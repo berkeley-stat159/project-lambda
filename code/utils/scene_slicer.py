@@ -5,8 +5,6 @@ import numpy as np
 import json
 import math
 
-
-
 IS_DAY = 0
 IS_INT = 1
 
@@ -36,14 +34,14 @@ class SceneSlicer:
                                                row['int-ext'] == "INT")
 
     def generate_scene_slices_(self):
-        day_night = least_int_great_than_(17/2)*[None]
-        int_ext = least_int_great_than_(17/2)*[None]
+        day_night = least_int_great_than_(17 / 2) * [None]
+        int_ext = least_int_great_than_(17 / 2) * [None]
         current_scene_start_time = 17
         for i in range(9, self.image.shape[-1]):
-            if i*2 - 1 in self.scene_desc:
-                current_scene_start_time = i*2 - 1 
-            elif i*2 in self.scene_desc:
-                current_scene_start_time = i*2
+            if i * 2 - 1 in self.scene_desc:
+                current_scene_start_time = i * 2 - 1
+            elif i * 2 in self.scene_desc:
+                current_scene_start_time = i * 2
             day_night.append(self.scene_desc[current_scene_start_time][0])
             int_ext.append(self.scene_desc[current_scene_start_time][1])
         day_night = convert_boolean_to_int_array_(day_night)
@@ -64,6 +62,7 @@ class SceneSlicer:
         is_int_slice = self.scene_slices[INT_EXT_IND][slice] == 0
         return (is_day_slice, is_int_slice)
 
+
 def convert_boolean_to_int_array_(array):
     converted_array = []
     for elem in array:
@@ -72,6 +71,7 @@ def convert_boolean_to_int_array_(array):
         else:
             converted_array.append(elem + 0)
     return converted_array
+
 
 def least_int_great_than_(number):
     return int(math.ceil(number))
