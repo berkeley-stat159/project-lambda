@@ -13,7 +13,7 @@ from linear_modeling import *
 import rf
 
 # Load data
-img = nib.load('test_data.nii')  
+img = nib.load('bold_dico_dico_rcds_nl.nii')  
 data = img.get_data()
 
 # Design Matrix
