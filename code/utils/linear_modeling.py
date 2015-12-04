@@ -9,20 +9,20 @@ import scene_slicer as ssm
 import plot
 import nibabel as nib
 
-def get_design_matrix():
+def get_design_matrix(data_path='../../data/processed/sub1_rcds.nii'):
     """
     Returns
     -------
     Design matrix with 5 columns, including the 3 columns of interest,
     the linear drift column, and the column of ones
     """
-    data = nib.load('test_data.nii')
+    data = nib.load(data_path)
     n_trs = data.shape[-1]
     X = np.ones((n_trs, 3))
-    ss = ssm.SceneSlicer('test_data.nii','scenes.csv') 
+    ss = ssm.SceneSlicer(data_path,'scenes.csv') 
     day_night, int_ext = ss.get_scene_slices()
-    X[:, 1] = day_night
-    X[:, 2] = np.linspace(-1, 1, n_trs)
+    X[:, 1] = np.linspace(-1, 1, n_trs)
+    X[:, 2] = day_night
     return X
 
 #design matrix that is passed into random forrest
