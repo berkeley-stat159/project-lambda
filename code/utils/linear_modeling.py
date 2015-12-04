@@ -186,4 +186,3 @@ def plot_single_voxel(data, top_100_voxels):
     """
     plt.plot(data[get_index_4d(data, top_100_voxels)[0]])
 # fix so only get top voxel
-
