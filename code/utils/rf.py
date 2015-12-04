@@ -23,5 +23,4 @@ def cv_rf_accuracy(X, y, est=1000, feat=10, depth=10, num_folds=5):
     for train, test in kf:
         avg_acc += rf_accuracy(X[train], y[train], X[test], y[test], est, feat,
                                depth)
-        print avg_acc
     return avg_acc / float(num_folds)
