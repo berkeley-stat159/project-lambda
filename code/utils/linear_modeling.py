@@ -6,8 +6,8 @@ import numpy.linalg as npl
 from scipy.stats import t as t_dist
 from scipy.ndimage import gaussian_filter
 import scene_slicer as ssm
-import plot
 import nibabel as nib
+
 
 def get_design_matrix():
     """
@@ -19,7 +19,7 @@ def get_design_matrix():
     data = nib.load('test_data.nii')
     n_trs = data.shape[-1]
     X = np.ones((n_trs, 3))
-    ss = ssm.SceneSlicer('test_data.nii','scenes.csv') 
+    ss = ssm.SceneSlicer('test_data.nii','scenes.csv')
     day_night, int_ext = ss.get_scene_slices()
     X[:, 1] = day_night
     X[:, 2] = np.linspace(-1, 1, n_trs)
@@ -27,12 +27,13 @@ def get_design_matrix():
 
 #design matrix that is passed into random forrest
 def get_rf_design_matrix(voxels,data):
-    ss = ssm.SceneSlicer('test_data.nii','scenes.csv')     
+    ss = ssm.SceneSlicer('test_data.nii','scenes.csv')
     day_night, int_ext = ss.get_scene_slices()
-    new_X = np.zeros((data.shape[-1],len(voxels)))
+    new_X = np.zeros((data.shape[-1], len(voxels)))
     for num in range(len(voxels)):
-        new_X[:,num] = data[voxels[num]]
-    return new_X,day_night
+        new_X[:, num] = data[voxels[num]]
+    return new_X, day_night
+
 
 def plot_design_matrix(X):
     """
@@ -75,13 +76,13 @@ def plot_betas(b_vols, col):
     None
     """
     if col >= b_vols.shape[-1]:
-	    raise RuntimeError("Error: select a column between 0 and p")
+        raise RuntimeError("Error: select a column between 0 and p")
     c = b_vols.shape[2]//2
-    plt.imshow(b_vols[:,:,c,col],cmap='gray',interpolation='nearest')
+    plt.imshow(b_vols[:, :, c, col], cmap='gray', interpolation='nearest')
 
 
 def t_stat(y, X, c):
-    """ betas, t statistic and significance test given data, 
+    """ betas, t statistic and significance test given data,
     design matix, contrast
     This is OLS estimation; we assume the errors to have independent
     and identical normal distributions around zero for each $i$ in
@@ -119,9 +120,9 @@ def get_top_32(t,thresh=100/1108800):
     Parameters                                                                  
     ----------                                                                 
     t: 1D array of t-statistics for each voxel
-    
-    Returns                                                                     
-    -------                                                                     
+
+    Returns
+    -------
     1D array of position of voxels in top 32 of t-statistics (all are positive
     """
     a = np.int32(round(len(t) * thresh))
@@ -149,4 +150,3 @@ def plot_single_voxel(data, top_100_voxels):
     None
     """
     plt.plot(data[get_index_4d(data, top_100_voxels)[0]])
-#fix so only get top voxel
