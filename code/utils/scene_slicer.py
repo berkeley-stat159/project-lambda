@@ -63,7 +63,7 @@ class SceneSlicer:
     def get_day_night(self, slice):
         if not self.scene_slices:
             self.get_scene_slices()
-        is_day_slice = self.scene_slices[DAY_NIGHT_IND][slice] == 0
-        is_int_slice = self.scene_slices[INT_EXT_IND][slice] == 0
-        return (is_day_slice, is_int_slice)
+        day_label = self.scene_slices[DAY_NIGHT_IND][slice]
+        int_label = self.scene_slices[INT_EXT_IND][slice]
+        return (day_label, int_label)
 
