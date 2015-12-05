@@ -5,8 +5,11 @@ import numpy as np
 import json
 import math
 
-IS_DAY = 0
-IS_INT = 1
+INTEGER_LABELS = {'day-night': {'DAY': 0,
+                                'NIGHT': 1,
+                                'DAWN': 2},
+                  'int-ext': {'INT': 0,
+                              'EXT': 1}}
 
 DAY_NIGHT_IND = 0
 INT_EXT_IND = 1
@@ -32,12 +35,13 @@ class SceneSlicer:
                 fieldnames=['seconds', 'scene', 'day-night', 'int-ext'])
             for row in reader:
                 scene_time = int(float(row['seconds']))
-                self.scene_desc[scene_time] = (row['day-night'] == "DAY",
-                                               row['int-ext'] == "INT")
+                self.scene_desc[scene_time] = (
+                    INTEGER_LABELS['day-night'][row['day-night']],
+                    INTEGER_LABELS['int-ext'][row['int-ext']])
 
     def generate_scene_slices_(self):
         num_offset_slices = int(math.floor(TUNING_SECONDS_OFFSET / 2))
-        day_night = num_offset_slices  * [None]
+        day_night = num_offset_slices * [None]
         int_ext = num_offset_slices * [None]
         current_scene_start_time = TUNING_SECONDS_OFFSET
         for i in range(num_offset_slices, self.image.shape[-1]):
@@ -47,8 +51,6 @@ class SceneSlicer:
                 current_scene_start_time = i * 2 + 2
             day_night.append(self.scene_desc[current_scene_start_time][0])
             int_ext.append(self.scene_desc[current_scene_start_time][1])
-        day_night = convert_boolean_to_int_array_(day_night)
-        int_ext = convert_boolean_to_int_array_(int_ext)
         self.scene_slices = (day_night, int_ext)
 
     def get_scene_slices(self):
@@ -64,18 +66,4 @@ class SceneSlicer:
         is_day_slice = self.scene_slices[DAY_NIGHT_IND][slice] == 0
         is_int_slice = self.scene_slices[INT_EXT_IND][slice] == 0
         return (is_day_slice, is_int_slice)
-
-
-def convert_boolean_to_int_array_(array):
-    converted_array = []
-    for elem in array:
-        if elem is None:
-            converted_array.append(elem)
-        else:
-            converted_array.append(int(elem))
-    return converted_array
-
-
-def least_int_great_than_(number):
-    return int(math.ceil(number))
 
