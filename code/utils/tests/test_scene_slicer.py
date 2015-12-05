@@ -20,7 +20,7 @@ def test_prepare():
         scenewriter = csv.writer(csvfile, delimiter=',', quotechar='"')
         scenewriter.writerow([17.0, "SAVANNAH", "DAY", "EXT"])
         scenewriter.writerow([272.0, "DOCTORS OFFICE", "DAY", "INT"])
-    ss = scene_slicer.SceneSlicer(['test_data.nii'], 'scene.csv')
+    ss = scene_slicer.SceneSlicer('test_data.nii', 'scene.csv')
     return ss
 
 
@@ -47,22 +47,15 @@ def test_scene_slicer_dict():
     delete_files()
 
 
-def test_scene_slicer_image():
-    ss = test_prepare()
-    ss.get_image(0)
-    assert ss.images[0] != 0
-    delete_files()
-
-
 def test_scene_slicer_slices():
     ss = test_prepare()
-    ss.get_scene_slices(0)
-    assert ss.scene_slices[0] != 0
+    ss.get_scene_slices()
+    assert len(ss.scene_slices) != 0
     delete_files()
 
 
 def test_scene_slicer_day_night():
     ss = test_prepare()
-    scene_tup = ss.get_day_night(0, 0)
+    scene_tup = ss.get_day_night(0)
     assert scene_tup == (True, False)
     delete_files()
