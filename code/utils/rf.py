@@ -1,24 +1,26 @@
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.cross_validation import KFold
 import numpy as np
-# look at train_test_split() to see if that's an option
 
-def rf_accuracy(X, y):
-    model = RandomForestClassifier(n_estimators=1000,
-                                   max_features=10,
-                                   max_depth=10)
+
+def rf_accuracy(X_train, y_train, X_test, y_test, est=1000, feat=10, depth=10):
+    model = RandomForestClassifier(n_estimators=est,
+                                   max_features=feat,
+                                   max_depth=depth)
+    model.fit(X_train, y_train)
+    results = model.score(X_test, y_test)
+    return results
+
+
+# Defaults split into 80/20
+def cv_rf_accuracy(X, y, est=1000, feat=10, depth=10, num_folds=5):
     index_array = np.arange(X.shape[0])
     np.random.shuffle(index_array)
-    eighty = int(X.shape[0] * 0.8)
-    train_index = index_array[:eighty]
-    test_index = index_array[eighty:]
-    train_X = X[train_index]
-    train_y = np.empty_like(train_index)
-    for num in range(len(train_index)):
-        train_y[num] = y[train_index[num]]
-    test_X = X[test_index]
-    test_y = np.empty_like(test_index)
-    for num in range(len(test_index)):
-        test_y[num]=y[test_index[num]]
-    model.fit(train_X, train_y)
-    results = model.score(test_X, test_y)
-    return results
+    X = X[index_array]
+    y = y[index_array]
+    kf = KFold(X.shape[0], n_folds=num_folds)
+    avg_acc = 0
+    for train, test in kf:
+        avg_acc += rf_accuracy(X[train], y[train], X[test], y[test], est, feat,
+                               depth)
+    return avg_acc / float(num_folds)
