@@ -2,18 +2,13 @@
 Test linear_modeling.py module
 
 Run with:
-	nosetests test_linear_modeling.py
+    nosetests test_linear_modeling.py
 """
 
 # Python 3 compatibility
 from __future__ import absolute_import, division, print_function
 import numpy as np
-import matplotlib.pyplot as plt
-import numpy.linalg as npl
-from scipy.stats import t as t_dist
-from .. import scene_slicer, plot
-
-from .. import linear_modeling
+import linear_modeling as linear_modeling
 from numpy.testing import assert_almost_equal
 
 # Make an X, y
@@ -36,14 +31,14 @@ data = np.reshape(y, (1, 2, 3, 4))
 
 
 def test_get_betas():
-    actual = linear_modeling.get_betas(X, y[:, 0])
+    actual = linear_modeling.get_betas_Y(X, y[:, 0])
     expected = np.array([[2., 3]]).T
     assert_almost_equal(expected, actual)
 
 
 def test_get_betas_4d():
     actual = linear_modeling.get_betas_4d(
-        linear_modeling.get_betas(X, data), data)
+        linear_modeling.get_betas_Y(X, data), data)
     expected = np.array([[[
         [2.00000000e+00, -1.50000000e+00
          ], [1.00000000e+00, 1.00000000e+00], [2.00000000e+00, -1.00000000e+00]
@@ -83,7 +78,7 @@ def test_get_top_100():
 
 def test_get_index_4d():
     actual = linear_modeling.get_index_4d([3, 8, 23, 1], (2, 3, 4))
-    assert_equal(actual, [(0, 0, 3), (0, 2, 0), (1, 2, 3), (0, 0, 1)])
+    assert actual == [(0, 0, 3), (0, 2, 0), (1, 2, 3), (0, 0, 1)]
 
     # def test_plot_single_voxel():
     # 	not sure how to test plots
