@@ -33,7 +33,6 @@ def test_scene_slicer_init():
     ss = test_prepare()
     assert ss.scene_desc is not None
     assert ss.scene_keys is not None
-    assert ss.segment_duration == [902, 882, 876, 976, 924, 878, 1086, 673.4]
     delete_files()
 
 
