@@ -53,15 +53,9 @@ def get_betas_Y(X, data):
     -------
     B: 2D array, p x B, the number of voxels
     """
-    print(data.shape[-1])
-    print(type(data))
-    # Y = np.reshape(data, (data.shape[-1], -1))
-    Y = np.reshape(data, (-1, data.shape[-1]))
-    print(Y.shape)
-    # B = npl.pinv(X).dot(Y)
+    Y = np.reshape(data,(-1,data.shape[-1]))
     B = npl.pinv(X).dot(Y.T)
-    print(B.shape)
-    return B, Y.T
+    return B,Y.T
 
 
 def get_betas_4d(B, data):
@@ -70,7 +64,6 @@ def get_betas_4d(B, data):
     -------
     4D array, beta for each voxel; need this format to plot
     """
-    print(B.shape)
     return np.reshape(B.T, data.shape[:-1] + (-1,))
 
 
@@ -121,43 +114,13 @@ def t_stat(y, X, c):
     # calculate bottom half of t statistic
     SE = np.sqrt(MRSS * c.T.dot(npl.pinv(X.T.dot(X)).dot(c)))
     t = c.T.dot(beta) / SE
-    return abs(t)
+    return abs(t[0])
 
-
-#def get_top_100(t,thresh=100/1108800):
-#    """
-#    Parameters
-#    ----------
-#    t: 1D array of t-statistics for each voxel
-#
-#    Returns
-#    -------
-#    1D array of position of voxels in top 100 of t-statistics (all are
-#    positive)
-#    """
-#    a = np.int32(round(len(t) * thresh))
-#    # top_100_voxels = np.argpartition(t, -a)[-a:]
-#    # problem: nans, try
-#    top_100_voxels = np.argpartition(~np.isnan(t),-1)[-a:]
-
-#    return top_100_voxels
-
-
-#def  get_index_4d(top_100_voxels, data):
-#    """
-#    Returns
-#    -------
-#    Indices in terms of 4D array of each voxel in top 20% of t-statistics
-#    """
-#    shape = data[...,-1].shape
-#    axes = np.unravel_index(top_100_voxels, shape)
-#    return zip(axes[0], axes[1], axes[2]) # sequence too large, try n = 32
-
-# Solve the problem by using 32 for next two functions intead
-def get_top_32(t, thresh=100/1108800):
-    """
-    Parameters
-    ----------
+    
+def get_top_32(t,thresh=100/1108800):                                          
+    """     
+    Parameters                                                                  
+    ----------                                                                 
     t: 1D array of t-statistics for each voxel
 
     Returns
@@ -165,20 +128,22 @@ def get_top_32(t, thresh=100/1108800):
     1D array of position of voxels in top 32 of t-statistics (all are positive
     """
     a = np.int32(round(len(t) * thresh))
-    top_32_voxels = np.argpartition(~np.isnan(t), -1)[-a:]
-    return top_32_voxels
-
+    return t.argsort()[-a:][::-1]
+										
 
 def get_index_4d(top_32_voxels, data):
     """
+    Parameters
+    ---------
+    top_32_voxels: 1D array of indices of top 32 voxels
+
     Returns
     -------
     Indices in terms of 4D array of each voxel in top 20% of t-statistics
-    """
-    shape = data[..., -1].shape
-    axes = np.unravel_index(top_32_voxels, shape)
-    return zip(axes[0], axes[1], axes[2])
-
+    """                                                                         
+    shape = data[...,-1].shape	
+    axes = np.unravel_index(top_32_voxels,shape)
+    return zip(*axes)
 
 def plot_single_voxel(data, top_100_voxels):
     """
@@ -187,5 +152,3 @@ def plot_single_voxel(data, top_100_voxels):
     None
     """
     plt.plot(data[get_index_4d(data, top_100_voxels)[0]])
-# fix so only get top voxel
-
