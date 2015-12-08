@@ -1,60 +1,63 @@
-# Python 3 compatibility
 from __future__ import absolute_import, division, print_function
-
 from .. import scene_slicer
 import os
 import nibabel as nib
 import csv
 import numpy as np
 
-IS_DAY = 0
-IS_INT = 1
 
-
-def test_prepare():
-    data = np.array([[[[7, 9], [7, 8]], [[1, 2], [1, 8]]], [[[2, 3], [2, 1]],
-                                                            [[5, 4], [4, 3]]]])
+def setup_test():
+    data = np.zeros((2, 2, 2, 50))
     img = nib.Nifti1Image(data, affine=np.diag([1, 1, 1, 1]))
     nib.save(img, 'test_data.nii')
-    with open('scene.csv', 'w') as csvfile:
+    with open('test_scenes.csv', 'w') as csvfile:
         scenewriter = csv.writer(csvfile, delimiter=',', quotechar='"')
-        scenewriter.writerow([17.0, "SAVANNAH", "DAY", "EXT"])
-        scenewriter.writerow([272.0, "DOCTORS OFFICE", "DAY", "INT"])
-    ss = scene_slicer.SceneSlicer('test_data.nii', 'scene.csv')
-    return ss
+        scenewriter.writerow([17.0, 'SAVANNAH', 'DAY', 'EXT'])
+        scenewriter.writerow([40.0, 'DOCTORS OFFICE', 'NIGHT', 'INT'])
+        scenewriter.writerow([61.0, 'GUMP', 'DAY', 'EXT'])
+        scenewriter.writerow([82.0, 'GUMP', 'DAY', 'EXT'])
+        scenewriter.writerow([91.0, 'GUMP', 'NIGHT', 'INT'])
+    return scene_slicer.SceneSlicer('test_data.nii', 'test_scenes.csv')
 
 
-def delete_files():
+def teardown_test():
     os.remove('test_data.nii')
-    os.remove('scene.csv')
+    os.remove('test_scenes.csv')
+
+
+def test_constants():
+    assert scene_slicer.INTEGER_LABELS == {'day-night': {'DAY': 0,
+                                                         'NIGHT': 1,
+                                                         'DAWN': 2},
+                                           'int-ext': {'INT': 0,
+                                                       'EXT': 1}}
+    assert scene_slicer.TUNING_SECONDS_OFFSET == 17
 
 
 def test_scene_slicer_init():
-    ss = test_prepare()
-    assert ss.scene_desc is not None
-    assert ss.scene_keys is not None
-    delete_files()
+    ss = setup_test()
+    assert ss.path_to_scene_csv == 'test_scenes.csv'
+    np.testing.assert_array_equal(ss.image.get_data(), np.zeros((2, 2, 2, 50)))
+    assert ss.scene_slices == []
+    assert ss.scene_desc == {}
+    teardown_test()
 
 
-def test_scene_slicer_dict():
-    ss = test_prepare()
-    ss.generate_scene_desc_dict()
-    for i in ss.scene_desc:
-        assert len(ss.scene_desc[i]) == 2
-        assert ss.scene_desc[i][IS_DAY] == 0 or ss.scene_desc[i][IS_DAY] == 1
-        assert ss.scene_desc[i][IS_INT] == 0 or ss.scene_desc[i][IS_INT] == 1
-    delete_files()
+def test_get_scene_slices():
+    ss = setup_test()
+    scene_slices = ss.get_scene_slices()
+    day_night_labels = 9*[None] + 11*[0] + 11*[1] + 15*[0] + 4*[1] 
+    int_ext_labels = 9*[None] + 11*[1] + 11*[0] + 15*[1] + 4*[0] 
+    assert scene_slices[0] == day_night_labels
+    assert scene_slices[1] == int_ext_labels
+    teardown_test()
+
+def test_get_labels_by_slice():
+    ss = setup_test()
+    assert (None, None) == ss.get_labels_by_slice(0)
+    assert (None, None) == ss.get_labels_by_slice(8)
+    assert (0, 1) == ss.get_labels_by_slice(10)
+    assert (1, 0) == ss.get_labels_by_slice(48)
+    teardown_test()
 
 
-def test_scene_slicer_slices():
-    ss = test_prepare()
-    ss.get_scene_slices()
-    assert len(ss.scene_slices) != 0
-    delete_files()
-
-
-def test_scene_slicer_day_night():
-    ss = test_prepare()
-    scene_tup = ss.get_day_night(0)
-    assert scene_tup == (True, False)
-    delete_files()
