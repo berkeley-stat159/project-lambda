@@ -11,14 +11,7 @@ INTEGER_LABELS = {'day-night': {'DAY': 0,
                   'int-ext': {'INT': 0,
                               'EXT': 1}}
 
-DAY_NIGHT_IND = 0
-INT_EXT_IND = 1
-
 TUNING_SECONDS_OFFSET = 17
-
-# with open('../../data/data_path.json', 'r') as fh:
-#     data_paths = json.load(fh)
-# path_to_subject_image = "../../" + data_paths['bold_dico_7Tad2grpbold7Tad']['sub1']['runs'][0]['path']
 
 
 class SceneSlicer:
@@ -40,15 +33,15 @@ class SceneSlicer:
                     INTEGER_LABELS['int-ext'][row['int-ext']])
 
     def generate_scene_slices_(self):
-        num_offset_slices = int(math.floor(TUNING_SECONDS_OFFSET / 2))
+        num_offset_slices = int(math.ceil(TUNING_SECONDS_OFFSET / 2))
         day_night = num_offset_slices * [None]
         int_ext = num_offset_slices * [None]
         current_scene_start_time = TUNING_SECONDS_OFFSET
         for i in range(num_offset_slices, self.image.shape[-1]):
-            if i * 2 + 1 in self.scene_desc:
-                current_scene_start_time = i * 2 + 1
-            elif i * 2 + 2 in self.scene_desc:
-                current_scene_start_time = i * 2 + 2
+            if i * 2 in self.scene_desc:
+                current_scene_start_time = i * 2
+            elif i * 2 - 1 in self.scene_desc:
+                current_scene_start_time = i * 2 - 1
             day_night.append(self.scene_desc[current_scene_start_time][0])
             int_ext.append(self.scene_desc[current_scene_start_time][1])
         self.scene_slices = (day_night, int_ext)
@@ -60,10 +53,9 @@ class SceneSlicer:
             self.generate_scene_slices_()
         return self.scene_slices
 
-    def get_day_night(self, slice):
+    def get_labels_by_slice(self, slice):
         if not self.scene_slices:
             self.get_scene_slices()
-        day_label = self.scene_slices[DAY_NIGHT_IND][slice]
-        int_label = self.scene_slices[INT_EXT_IND][slice]
+        day_label = self.scene_slices[0][slice]
+        int_label = self.scene_slices[1][slice]
         return (day_label, int_label)
-
