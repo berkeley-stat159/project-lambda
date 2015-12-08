@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy.linalg as npl
 from scipy.stats import t as t_dist
 from scipy.ndimage import gaussian_filter
-import scene_slicer as ssm
+from . import scene_slicer as ssm
 import nibabel as nib
 
 

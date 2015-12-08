@@ -68,7 +68,7 @@ def test_get_top_32():
 
 def test_get_index_4d():
     actual = linear_modeling.get_index_4d([0, 2], data)
-    assert_equal(actual, [(0, 0), (0, 2)])
+    assert_equal(list(actual), [(0, 0), (0, 2)])
 
     # def test_plot_single_voxel():
     # 	not sure how to test plots
