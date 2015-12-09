@@ -1,4 +1,4 @@
-from stat159lambda.utils import rf
+from stat159lambda.classification import rf
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 try:

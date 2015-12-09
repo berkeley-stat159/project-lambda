@@ -4,14 +4,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import numpy.linalg as npl
 from scipy.stats import t as t_dist
-from scipy.ndimage import gaussian_filter
 import stat159lambda.utils.scene_slicer as ssm
 import nibabel as nib
 
 
-
 def get_design_matrix():
-
     """
     Returns
     -------
@@ -21,20 +18,11 @@ def get_design_matrix():
     data = nib.load(data_path)
     n_trs = data.shape[-1]
     X = np.ones((n_trs, 3))
-    ss = ssm.SceneSlicer('test_data.nii','scenes.csv')
+    ss = ssm.SceneSlicer('test_data.nii', 'scenes.csv')
     day_night, int_ext = ss.get_scene_slices()
     X[:, 1] = np.linspace(-1, 1, n_trs)
     X[:, 2] = day_night
     return X
-
-#design matrix that is passed into random forrest
-def get_rf_design_matrix(voxels,data):
-    ss = ssm.SceneSlicer('test_data.nii','scenes.csv')
-    day_night, int_ext = ss.get_scene_slices()
-    new_X = np.zeros((data.shape[-1], len(voxels)))
-    for num in range(len(voxels)):
-        new_X[:, num] = data[voxels[num]]
-    return new_X, day_night
 
 
 def plot_design_matrix(X):
@@ -53,9 +41,9 @@ def get_betas_Y(X, data):
     -------
     B: 2D array, p x B, the number of voxels
     """
-    Y = np.reshape(data,(-1,data.shape[-1]))
+    Y = np.reshape(data, (-1, data.shape[-1]))
     B = npl.pinv(X).dot(Y.T)
-    return B,Y.T
+    return B, Y.T
 
 
 def get_betas_4d(B, data):
@@ -64,7 +52,7 @@ def get_betas_4d(B, data):
     -------
     4D array, beta for each voxel; need this format to plot
     """
-    return np.reshape(B.T, data.shape[:-1] + (-1,))
+    return np.reshape(B.T, data.shape[:-1] + (-1, ))
 
 
 def plot_betas(b_vols, col):
@@ -79,7 +67,7 @@ def plot_betas(b_vols, col):
     """
     if col >= b_vols.shape[-1]:
         raise RuntimeError("Error: select a column between 0 and p")
-    c = b_vols.shape[2]//2
+    c = b_vols.shape[2] // 2
     plt.imshow(b_vols[:, :, c, col], cmap='gray', interpolation='nearest')
 
 
@@ -116,8 +104,8 @@ def t_stat(y, X, c):
     t = c.T.dot(beta) / SE
     return abs(t[0])
 
-    
-def get_top_32(t,thresh=100/1108800):                                          
+
+def get_top_32(t, thresh=100 / 1108800):
     """     
     Parameters                                                                  
     ----------                                                                 
@@ -129,7 +117,7 @@ def get_top_32(t,thresh=100/1108800):
     """
     a = np.int32(round(len(t) * thresh))
     return t.argsort()[-a:][::-1]
-										
+
 
 def get_index_4d(top_32_voxels, data):
     """
@@ -140,10 +128,11 @@ def get_index_4d(top_32_voxels, data):
     Returns
     -------
     Indices in terms of 4D array of each voxel in top 20% of t-statistics
-    """                                                                         
-    shape = data[...,-1].shape	
-    axes = np.unravel_index(top_32_voxels,shape)
+    """
+    shape = data[..., -1].shape
+    axes = np.unravel_index(top_32_voxels, shape)
     return zip(*axes)
+
 
 def plot_single_voxel(data, top_100_voxels):
     """
