@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from .. import variance
+from stat159lambda.utils import variance
 
 import numpy as np
 import nibabel as nib

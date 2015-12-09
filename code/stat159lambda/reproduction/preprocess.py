@@ -7,12 +7,9 @@ import sys
 from glob import glob
 from os.path import exists
 from multiprocessing import Pool
+from stat159lambda.config import REPO_HOME_PATH
 
-REPO_HOME_RELATIVE_PATH = '../../'
-sys.path.append(REPO_HOME_RELATIVE_PATH)
-import config as cf
-
-DATA_PATHS = json.load(open(REPO_HOME_RELATIVE_PATH + 'data/data_path.json'))
+DATA_PATHS = json.load(open('{0}/data/data_path.json'.format(REPO_HOME_PATH)))
 
 INCORRECT_NUM_ARGS_MESSAGE = 'Invalid number of arguments: specify alignment type'
 ILLEGAL_ARG_MESSAGE = 'preprocess.py must be provided with alignment argument'
@@ -20,13 +17,13 @@ ILLEGAL_ARG_MESSAGE = 'preprocess.py must be provided with alignment argument'
 
 def concatenate_runs(alignment):
     for i, subject in enumerate(DATA_PATHS['subjects']):
-        nii_file_name = '{0}data/processed/sub{1}_{2}'.format(
-            REPO_HOME_RELATIVE_PATH, i + 1, alignment)
+        nii_file_name = '{0}/data/processed/sub{1}_{2}'.format(
+            REPO_HOME_PATH, i + 1, alignment)
         if not exists(nii_file_name + '.nii') or not cf.USE_CACHED_DATA:
             run_data = []
             for j, run in enumerate(subject['runs']):
                 task_path = run[alignment]['path']
-                img = nib.load(REPO_HOME_RELATIVE_PATH + task_path)
+                img = nib.load(REPO_HOME_PATH + '/' + task_path)
                 data = img.get_data()
                 if j == 0:
                     run_data.append(data[..., :-4])
@@ -44,8 +41,8 @@ def concatenate_runs(alignment):
 
 
 def reshape_data_to_2d(alignment):
-    files_to_reshape = np.sort(glob('{0}data/processed/sub*_{1}.nii'.format(
-        REPO_HOME_RELATIVE_PATH, alignment)))
+    files_to_reshape = np.sort(glob('{0}/data/processed/sub*_{1}.nii'.format(
+        REPO_HOME_PATH, alignment)))
     for f in files_to_reshape:
         file_name_2d = f.replace('.nii', '_2d')
         if not exists(file_name_2d + '.npy') or not cf.USE_CACHED_DATA:

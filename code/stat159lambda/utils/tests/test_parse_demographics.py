@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from .. import parse_demographics
+from stat159lambda.utils import parse_demographics
 
 import os
 import csv

@@ -9,10 +9,7 @@ import sys
 from os import path
 import sharedmem as sm
 import gc
-
-REPO_HOME_RELATIVE_PATH = '../../'
-sys.path.append(REPO_HOME_RELATIVE_PATH)
-import config as cf
+from stat159lambda.config import REPO_HOME_PATH
 
 INCORRECT_NUM_ARGS_MESSAGE = 'invalid number of arguments: specify alignment type, subject1 and subject2'
 ILLEGAL_ALIGNMENT_ARG_MESSAGE = 'alignment argument must be either <rcds>, <linear>, <non_linear>'
@@ -54,10 +51,10 @@ def check_command_line_arguments(arguments):
         subject2 = int(arguments[3])
     except:
         raise ValueError(ILLEGAL_SUBJECTS_ARG_MESSAGE)
-    subject1_file_path = '{0}data/processed/sub{1}_{2}_2d.npy'.format(
-        REPO_HOME_RELATIVE_PATH, subject1, alignment)
-    subject2_file_path = '{0}data/processed/sub{1}_{2}_2d.npy'.format(
-        REPO_HOME_RELATIVE_PATH, subject2, alignment)
+    subject1_file_path = '{0}/data/processed/sub{1}_{2}_2d.npy'.format(
+        REPO_HOME_PATH, subject1, alignment)
+    subject2_file_path = '{0}/data/processed/sub{1}_{2}_2d.npy'.format(
+        REPO_HOME_PATH, subject2, alignment)
     if not path.exists(subject1_file_path):
         raise ValueError(
             'Filing missing: {0}, run preprocess.py to generate necessary file'.format(
@@ -72,8 +69,8 @@ def check_command_line_arguments(arguments):
 if __name__ == '__main__':
     subject1_file_path, subject2_file_path = check_command_line_arguments(
         sys.argv)
-    correlation_file_name = '{0}data/processed/r_sub{1}_sub{2}_{3}'.format(
-        REPO_HOME_RELATIVE_PATH, sys.argv[2], sys.argv[3], sys.argv[1])
+    correlation_file_name = '{0}/data/processed/r_sub{1}_sub{2}_{3}'.format(
+        REPO_HOME_PATH, sys.argv[2], sys.argv[3], sys.argv[1])
     if not path.exists(correlation_file_name +
                        '.npy') or not cf.USE_CACHED_DATA:
         shared_subject1 = sm.copy(np.load(subject1_file_path))

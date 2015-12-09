@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from .. import plot
+from stat159lambda.utils import plot
 
 import numpy as np
 import matplotlib
