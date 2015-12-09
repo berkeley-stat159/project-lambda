@@ -1,0 +1,97 @@
+nose.config: INFO: Ignoring files matching ['^\\.', '^_', '^setup\\.py$']
+nose.plugins.manager: DEBUG: Configuring plugins
+nose.plugins.manager: DEBUG: Plugins enabled: [<nose.plugins.capture.Capture object at 0x10d20d950>, <nose.plugins.logcapture.LogCapture object at 0x10d217590>, <nose.plugins.deprecated.Deprecated object at 0x10d217990>, <nose.plugins.skip.Skip object at 0x10d3935d0>]
+nose.core: DEBUG: configured Config(addPaths=True, args=(), configSection='nosetests', debug='nose,nose.importer', debugLog='nose_debug', env={}, exclude=None, files=[], firstPackageWins=False, getTestCaseNamesCompat=False, ignoreFiles=[<_sre.SRE_Pattern object at 0x10cdf19b0>, <_sre.SRE_Pattern object at 0x10ce1a0b0>, <_sre.SRE_Pattern object at 0x10cd36b70>], ignoreFilesDefaultStrings=['^\\.', '^_', '^setup\\.py$'], include=None, includeExe=False, logStream=<open file '<stderr>', mode 'w' at 0x10cd0b1e0>, loggingConfig=None, options=<Values at 0x10d395fc8: {'xunit_file': 'nosetests.xml', 'enable_plugin_allmodules': None, 'multiprocess_restartworker': False, 'loggingConfig': None, 'doctestExtension': None, 'doctest_tests': None, 'enable_plugin_xunit': None, 'logcapture_clear': False, 'stopOnError': False, 'enable_plugin_id': None, 'testNames': None, 'doctestOptions': None, 'exclude': [], 'byteCompile': True, 'ignoreFiles': [], 'logcapture': True, 'addPaths': True, 'capture': True, 'logcapture_level': 'NOTSET', 'cover_xml': None, 'py3where': None, 'noSkip': False, 'enable_plugin_isolation': None, 'logcapture_filters': None, 'collect_only': None, 'failed': False, 'version': False, 'eval_attr': None, 'include': [], 'enable_plugin_profile': None, 'debugErrors': False, 'files': None, 'cover_tests': None, 'multiprocess_timeout': 10, 'testMatch': '(?:^|[\\b_\\./-])[Tt]est', 'traverseNamespace': False, 'firstPackageWins': False, 'cover_html_dir': 'cover', 'cover_branches': None, 'debugBoth': False, 'noDeprecated': False, 'cover_xml_file': 'coverage.xml', 'showPlugins': False, 'cover_erase': None, 'multiprocess_workers': 0, 'testIdFile': '.noseids', 'enable_plugin_coverage': None, 'attr': None, 'profile_sort': 'cumulative', 'doctestFixtures': None, 'logcapture_datefmt': None, 'cover_packages': None, 'verbosity': 1, 'enable_plugin_doctest': None, 'profile_stats_file': None, 'cover_inclusive': None, 'includeExe': False, 'logcapture_format': '%(name)s: %(levelname)s: %(message)s', 'debugFailures': False, 'detailedErrors': None, 'debugLog': 'nose_debug', 'doctest_result_var': None, 'cover_html': None, 'debug': 'nose,nose.importer', 'cover_min_percentage': None, 'where': None, 'profile_restrict': None}>, parser=<optparse.OptionParser instance at 0x10d20cdd0>, parserClass=<class optparse.OptionParser at 0x10cf52328>, plugins=<nose.plugins.manager.DefaultPluginManager object at 0x10d204e90>, py3where=(), runOnInit=True, srcDirs=('lib', 'src'), stopOnError=False, stream=<open file '<stderr>', mode 'w' at 0x10cd0b1e0>, testMatch=<_sre.SRE_Pattern object at 0x10d1d1330>, testMatchPat='(?:^|[\\b_\\./-])[Tt]est', testNames=['test_linear_modeling.py'], traverseNamespace=False, verbosity=1, where=(), worker=False, workingDir='/Users/alondaks/Dropbox/Berkeley-Senior_Year/stat159/project-lambda/code/utils/tests')
+nose.importer: DEBUG: Add path /Users/alondaks/Dropbox/Berkeley-Senior_Year/stat159/project-lambda/code/utils/tests
+nose.importer: DEBUG: Add path /Users/alondaks/Dropbox/Berkeley-Senior_Year/stat159/project-lambda/code/utils
+nose.importer: DEBUG: Add path /Users/alondaks/Dropbox/Berkeley-Senior_Year/stat159/project-lambda/code
+nose.importer: DEBUG: insert /Users/alondaks/Dropbox/Berkeley-Senior_Year/stat159/project-lambda/code into sys.path
+nose.core: DEBUG: test loader is <nose.loader.TestLoader object at 0x10d393910>
+nose.core: DEBUG: defaultTest .
+nose.core: DEBUG: Test names are ['test_linear_modeling.py']
+nose.core: DEBUG: createTests called with None
+nose.loader: DEBUG: load from test_linear_modeling.py (None)
+nose.selector: DEBUG: Test name test_linear_modeling.py resolved to file test_linear_modeling.py, module None, call None
+nose.selector: DEBUG: Final resolution of test name test_linear_modeling.py: file /Users/alondaks/Dropbox/Berkeley-Senior_Year/stat159/project-lambda/code/utils/tests/test_linear_modeling.py module utils.tests.test_linear_modeling call None
+nose.importer: DEBUG: Import utils.tests.test_linear_modeling from /Users/alondaks/Dropbox/Berkeley-Senior_Year/stat159/project-lambda/code
+nose.importer: DEBUG: Add path /Users/alondaks/Dropbox/Berkeley-Senior_Year/stat159/project-lambda/code
+nose.importer: DEBUG: find module part utils (utils) in ['/Users/alondaks/Dropbox/Berkeley-Senior_Year/stat159/project-lambda/code']
+nose.importer: DEBUG: find module part tests (utils.tests) in ['/Users/alondaks/Dropbox/Berkeley-Senior_Year/stat159/project-lambda/code/utils']
+nose.importer: DEBUG: find module part test_linear_modeling (utils.tests.test_linear_modeling) in ['/Users/alondaks/Dropbox/Berkeley-Senior_Year/stat159/project-lambda/code/utils/tests']
+nose.failure: DEBUG: A failure! <type 'exceptions.ImportError'> No module named matplotlib.pyplot ['  File "/Library/Python/2.7/site-packages/nose/loader.py", line 414, in loadTestsFromName\n    addr.filename, addr.module)\n', '  File "/Library/Python/2.7/site-packages/nose/importer.py", line 47, in importFromPath\n    return self.importFromDir(dir_path, fqname)\n', '  File "/Library/Python/2.7/site-packages/nose/importer.py", line 94, in importFromDir\n    mod = load_module(part_fqname, fh, filename, desc)\n', '  File "/Users/alondaks/Dropbox/Berkeley-Senior_Year/stat159/project-lambda/code/utils/tests/test_linear_modeling.py", line 12, in <module>\n    import matplotlib.pyplot as plt\n']
+nose.suite: DEBUG: Create suite for [<nose.failure.Failure testMethod=runTest>]
+nose.suite: DEBUG: tests [<nose.failure.Failure testMethod=runTest>] context None
+nose.suite: DEBUG: wrap [<nose.failure.Failure testMethod=runTest>]
+nose.suite: DEBUG: wrapping Failure: ImportError (No module named matplotlib.pyplot)
+nose.suite: DEBUG: Context suite for [Test(<nose.failure.Failure testMethod=runTest>)] (<class 'nose.failure.Failure'>) (4522911888)
+nose.suite: DEBUG: suite <nose.suite.ContextSuite context=Failure> has context Failure
+nose.suite: DEBUG: get ancestry <class 'nose.failure.Failure'>
+nose.suite: DEBUG:  <class 'nose.failure.Failure'> ancestors ['nose', 'failure']
+nose: DEBUG: __import__ nose.failure
+nose: DEBUG: resolve: ['failure'], nose.failure, <module 'nose' from '/Library/Python/2.7/site-packages/nose/__init__.pyc'>, <module 'nose' from '/Library/Python/2.7/site-packages/nose/__init__.pyc'>
+nose.suite: DEBUG: suite <nose.suite.ContextSuite context=Failure> has ancestor nose.failure
+nose.suite: DEBUG:  <class 'nose.failure.Failure'> ancestors ['nose']
+nose: DEBUG: __import__ nose
+nose: DEBUG: resolve: [], nose, <module 'nose' from '/Library/Python/2.7/site-packages/nose/__init__.pyc'>, <module 'nose' from '/Library/Python/2.7/site-packages/nose/__init__.pyc'>
+nose.suite: DEBUG: suite <nose.suite.ContextSuite context=Failure> has ancestor nose
+nose.suite: DEBUG: Create suite for [<nose.suite.ContextSuite context=Failure>]
+nose.suite: DEBUG: tests [<nose.suite.ContextSuite context=Failure>] context None
+nose.suite: DEBUG: wrap [<nose.suite.ContextSuite context=Failure>]
+nose.suite: DEBUG: wrapping <nose.suite.ContextSuite context=Failure>
+nose.suite: DEBUG: Context suite for [<nose.suite.ContextSuite context=Failure>] (<class 'nose.failure.Failure'>) (4516822224)
+nose.suite: DEBUG: suite <nose.suite.ContextSuite context=Failure> has context Failure
+nose.suite: DEBUG: get ancestry <class 'nose.failure.Failure'>
+nose.suite: DEBUG:  <class 'nose.failure.Failure'> ancestors ['nose', 'failure']
+nose: DEBUG: __import__ nose.failure
+nose: DEBUG: resolve: ['failure'], nose.failure, <module 'nose' from '/Library/Python/2.7/site-packages/nose/__init__.pyc'>, <module 'nose' from '/Library/Python/2.7/site-packages/nose/__init__.pyc'>
+nose.suite: DEBUG: suite <nose.suite.ContextSuite context=Failure> has ancestor nose.failure
+nose.suite: DEBUG:  <class 'nose.failure.Failure'> ancestors ['nose']
+nose: DEBUG: __import__ nose
+nose: DEBUG: resolve: [], nose, <module 'nose' from '/Library/Python/2.7/site-packages/nose/__init__.pyc'>, <module 'nose' from '/Library/Python/2.7/site-packages/nose/__init__.pyc'>
+nose.suite: DEBUG: suite <nose.suite.ContextSuite context=Failure> has ancestor nose
+nose.core: DEBUG: runTests called
+nose.suite: DEBUG: suite 4516822224 (<nose.suite.ContextSuite context=Failure>) run called, tests: <generator object _get_wrapped_tests at 0x10d968e60>
+nose.suite: DEBUG: suite 4516822224 setUp called, tests: <generator object _get_wrapped_tests at 0x10d9590a0>
+nose.suite: DEBUG: tests in 4516822224?
+nose.suite: DEBUG: ancestor <module 'nose' from '/Library/Python/2.7/site-packages/nose/__init__.pyc'> may need setup
+nose.suite: DEBUG: ancestor <module 'nose' from '/Library/Python/2.7/site-packages/nose/__init__.pyc'> does need setup
+nose.suite: DEBUG: <nose.suite.ContextSuite context=Failure> setup context <module 'nose' from '/Library/Python/2.7/site-packages/nose/__init__.pyc'>
+nose.suite: DEBUG: ancestor <module 'nose.failure' from '/Library/Python/2.7/site-packages/nose/failure.pyc'> may need setup
+nose.suite: DEBUG: ancestor <module 'nose.failure' from '/Library/Python/2.7/site-packages/nose/failure.pyc'> does need setup
+nose.suite: DEBUG: <nose.suite.ContextSuite context=Failure> setup context <module 'nose.failure' from '/Library/Python/2.7/site-packages/nose/failure.pyc'>
+nose.suite: DEBUG: ancestor <class 'nose.failure.Failure'> may need setup
+nose.suite: DEBUG: ancestor <class 'nose.failure.Failure'> does need setup
+nose.suite: DEBUG: <nose.suite.ContextSuite context=Failure> setup context <class 'nose.failure.Failure'>
+nose: DEBUG: call fixture <class 'nose.failure.Failure'>.setUpClass
+nose.suite: DEBUG: completed suite setup
+nose.suite: DEBUG: precache is [<nose.suite.ContextSuite context=Failure>]
+nose.suite: DEBUG: suite 4522911888 (<nose.suite.ContextSuite context=Failure>) run called, tests: <generator object _get_wrapped_tests at 0x10d959190>
+nose.suite: DEBUG: suite 4522911888 setUp called, tests: <generator object _get_wrapped_tests at 0x10d959190>
+nose.suite: DEBUG: tests in 4522911888?
+nose.suite: DEBUG: ancestor <module 'nose' from '/Library/Python/2.7/site-packages/nose/__init__.pyc'> may need setup
+nose.suite: DEBUG: ancestor <module 'nose.failure' from '/Library/Python/2.7/site-packages/nose/failure.pyc'> may need setup
+nose.suite: DEBUG: ancestor <class 'nose.failure.Failure'> may need setup
+nose.suite: DEBUG: completed suite setup
+nose.suite: DEBUG: precache is [Test(<nose.failure.Failure testMethod=runTest>)]
+nose.suite: DEBUG: context teardown
+nose.suite: DEBUG: ancestor <class 'nose.failure.Failure'> may need teardown
+nose.suite: DEBUG: <nose.suite.ContextSuite context=Failure> setup ancestor <class 'nose.failure.Failure'>
+nose.suite: DEBUG: ancestor <module 'nose.failure' from '/Library/Python/2.7/site-packages/nose/failure.pyc'> may need teardown
+nose.suite: DEBUG: <nose.suite.ContextSuite context=Failure> setup ancestor <module 'nose.failure' from '/Library/Python/2.7/site-packages/nose/failure.pyc'>
+nose.suite: DEBUG: ancestor <module 'nose' from '/Library/Python/2.7/site-packages/nose/__init__.pyc'> may need teardown
+nose.suite: DEBUG: <nose.suite.ContextSuite context=Failure> setup ancestor <module 'nose' from '/Library/Python/2.7/site-packages/nose/__init__.pyc'>
+nose.suite: DEBUG: ancestor <class 'nose.failure.Failure'> may need teardown
+nose.suite: DEBUG: <nose.suite.ContextSuite context=Failure> setup ancestor <class 'nose.failure.Failure'>
+nose.suite: DEBUG: context teardown
+nose.suite: DEBUG: ancestor <class 'nose.failure.Failure'> may need teardown
+nose.suite: DEBUG: <nose.suite.ContextSuite context=Failure> setup ancestor <class 'nose.failure.Failure'>
+nose.suite: DEBUG: <nose.suite.ContextSuite context=Failure> teardown context <class 'nose.failure.Failure'>
+nose: DEBUG: call fixture <class 'nose.failure.Failure'>.tearDownClass
+nose.suite: DEBUG: ancestor <module 'nose.failure' from '/Library/Python/2.7/site-packages/nose/failure.pyc'> may need teardown
+nose.suite: DEBUG: <nose.suite.ContextSuite context=Failure> setup ancestor <module 'nose.failure' from '/Library/Python/2.7/site-packages/nose/failure.pyc'>
+nose.suite: DEBUG: <nose.suite.ContextSuite context=Failure> teardown context <module 'nose.failure' from '/Library/Python/2.7/site-packages/nose/failure.pyc'>
+nose.suite: DEBUG: ancestor <module 'nose' from '/Library/Python/2.7/site-packages/nose/__init__.pyc'> may need teardown
+nose.suite: DEBUG: <nose.suite.ContextSuite context=Failure> setup ancestor <module 'nose' from '/Library/Python/2.7/site-packages/nose/__init__.pyc'>
+nose.suite: DEBUG: <nose.suite.ContextSuite context=Failure> teardown context <module 'nose' from '/Library/Python/2.7/site-packages/nose/__init__.pyc'>
+nose.suite: DEBUG: ancestor <class 'nose.failure.Failure'> may need teardown
+nose.suite: DEBUG: ancestor <class 'nose.failure.Failure'> already torn down
