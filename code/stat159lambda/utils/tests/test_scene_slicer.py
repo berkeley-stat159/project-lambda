@@ -1,5 +1,5 @@
 from __future__ import absolute_import, division, print_function
-from .. import scene_slicer
+from stat159lambda.utils import scene_slicer
 import os
 import nibabel as nib
 import csv

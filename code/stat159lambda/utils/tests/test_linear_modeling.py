@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import numpy.linalg as npl
 from scipy.stats import t as t_dist
 
-from .. import linear_modeling
+from stat159lambda.utils import linear_modeling
 from numpy.testing import assert_equal, assert_almost_equal
 
 # Make an X, y
