@@ -3,6 +3,16 @@ from sklearn.cross_validation import KFold
 import numpy as np
 
 
+#design matrix that is passed into random forrest
+def get_rf_design_matrix(voxels, data):
+    ss = ssm.SceneSlicer('test_data.nii', 'scenes.csv')
+    day_night, int_ext = ss.get_scene_slices()
+    new_X = np.zeros((data.shape[-1], len(voxels)))
+    for num in range(len(voxels)):
+        new_X[:, num] = data[voxels[num]]
+        return new_X, day_night
+
+
 def rf_accuracy(X_train, y_train, X_test, y_test, est=1000, feat=10, depth=10):
     model = RandomForestClassifier(n_estimators=est,
                                    max_features=feat,
