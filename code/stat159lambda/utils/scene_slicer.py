@@ -4,6 +4,8 @@ import csv
 import numpy as np
 import json
 import math
+from stat159lambda.config import REPO_HOME_PATH
+from stat159lambda.config import NUM_OFFSET_VOLUMES, NUM_VOLUMES
 
 INTEGER_LABELS = {'day-night': {'DAY': 0,
                                 'NIGHT': 1,
@@ -15,9 +17,10 @@ TUNING_SECONDS_OFFSET = 17
 
 
 class SceneSlicer:
-    def __init__(self, path_to_subject_image, path_to_scene_csv):
+    def __init__(
+            self,
+            path_to_scene_csv='{0}/data/scenes.csv'.format(REPO_HOME_PATH)):
         self.path_to_scene_csv = path_to_scene_csv
-        self.image = nib.load(path_to_subject_image)
         self.scene_slices = []
         self.scene_desc = {}
 
@@ -33,11 +36,10 @@ class SceneSlicer:
                     INTEGER_LABELS['int-ext'][row['int-ext']])
 
     def generate_scene_slices_(self):
-        num_offset_slices = int(math.ceil(TUNING_SECONDS_OFFSET / 2))
-        day_night = num_offset_slices * [None]
-        int_ext = num_offset_slices * [None]
+        day_night = NUM_OFFSET_VOLUMES * [None]
+        int_ext = NUM_OFFSET_VOLUMES * [None]
         current_scene_start_time = TUNING_SECONDS_OFFSET
-        for i in range(num_offset_slices, self.image.shape[-1]):
+        for i in range(NUM_OFFSET_VOLUMES, NUM_VOLUMES):
             if i * 2 in self.scene_desc:
                 current_scene_start_time = i * 2
             elif i * 2 - 1 in self.scene_desc:
