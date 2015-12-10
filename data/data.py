@@ -19,7 +19,10 @@ def generate_file_md5(filename, blocksize=2**20):
                     break
                 m.update(buf)
     except OSError:
-        print("Oops you don't have this file")
+        print("Did you make data yet?")
+        return
+    except IOError:
+        print("Did you make data yet?")
         return
     return m.hexdigest()
 
