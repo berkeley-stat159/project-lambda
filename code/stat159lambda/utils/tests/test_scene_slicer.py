@@ -1,5 +1,6 @@
 from __future__ import absolute_import, division, print_function
 from stat159lambda.utils import scene_slicer
+from stat159lambda.config import NUM_VOLUMES
 import os
 import nibabel as nib
 import csv
@@ -42,9 +43,11 @@ def test_get_scene_slices():
     ss = setup_test()
     scene_slices = ss.get_scene_slices()
     day_night_labels = 9*[None] + 11*[0] + 11*[1] + 15*[0] + 4*[1] 
-    int_ext_labels = 9*[None] + 11*[1] + 11*[0] + 15*[1] + 4*[0] 
-    assert scene_slices[0] == day_night_labels
-    assert scene_slices[1] == int_ext_labels
+    int_ext_labels = 9*[None] + 11*[1] + 11*[0] + 15*[1] + 4*[0]
+    assert scene_slices[0][:50] == day_night_labels
+    assert scene_slices[1][:50] == int_ext_labels
+    assert len(scene_slices[0]) == NUM_VOLUMES
+    assert len(scene_slices[1]) == NUM_VOLUMES
     teardown_test()
 
 def test_get_labels_by_slice():
