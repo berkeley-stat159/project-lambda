@@ -10,7 +10,7 @@ from __future__ import print_function, division
 
 import numpy as np
 
-from .. import pearson
+from stat159lambda.utils import pearson
 
 from numpy.testing import assert_almost_equal
 

@@ -1,5 +1,6 @@
 # Tools for working with travis-ci
 export WHEELHOUSE="http://travis-wheels.scikit-image.org/"
+export PYTHONPATH=$(pwd)/code
 
 retry () {
     # https://gist.github.com/fungusakafungus/1026804

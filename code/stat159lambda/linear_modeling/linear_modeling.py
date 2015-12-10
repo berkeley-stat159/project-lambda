@@ -4,8 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import numpy.linalg as npl
 from scipy.stats import t as t_dist
-from scipy.ndimage import gaussian_filter
-import scene_slicer as ssm
+import stat159lambda.utils.scene_slicer as ssm
 import nibabel as nib
 
 
@@ -16,23 +15,14 @@ def get_design_matrix():
     Design matrix with 5 columns, including the 3 columns of interest,
     the linear drift column, and the column of ones
     """
-    data = nib.load('test_data.nii')
+    data = nib.load(data_path)
     n_trs = data.shape[-1]
     X = np.ones((n_trs, 3))
-    ss = ssm.SceneSlicer('test_data.nii','scenes.csv')
+    ss = ssm.SceneSlicer('test_data.nii', 'scenes.csv')
     day_night, int_ext = ss.get_scene_slices()
-    X[:, 1] = day_night
-    X[:, 2] = np.linspace(-1, 1, n_trs)
+    X[:, 1] = np.linspace(-1, 1, n_trs)
+    X[:, 2] = day_night
     return X
-
-#design matrix that is passed into random forrest
-def get_rf_design_matrix(voxels,data):
-    ss = ssm.SceneSlicer('test_data.nii','scenes.csv')
-    day_night, int_ext = ss.get_scene_slices()
-    new_X = np.zeros((data.shape[-1], len(voxels)))
-    for num in range(len(voxels)):
-        new_X[:, num] = data[voxels[num]]
-    return new_X, day_night
 
 
 def plot_design_matrix(X):
@@ -51,14 +41,8 @@ def get_betas_Y(X, data):
     -------
     B: 2D array, p x B, the number of voxels
     """
-    print(data.shape[-1])
-    print(type(data))
-    # Y = np.reshape(data, (data.shape[-1], -1))
     Y = np.reshape(data, (-1, data.shape[-1]))
-    print(Y.shape)
-    # B = npl.pinv(X).dot(Y)
     B = npl.pinv(X).dot(Y.T)
-    print(B.shape)
     return B, Y.T
 
 
@@ -68,8 +52,7 @@ def get_betas_4d(B, data):
     -------
     4D array, beta for each voxel; need this format to plot
     """
-    print(B.shape)
-    return np.reshape(B.T, data.shape[:-1] + (-1,))
+    return np.reshape(B.T, data.shape[:-1] + (-1, ))
 
 
 def plot_betas(b_vols, col):
@@ -84,7 +67,7 @@ def plot_betas(b_vols, col):
     """
     if col >= b_vols.shape[-1]:
         raise RuntimeError("Error: select a column between 0 and p")
-    c = b_vols.shape[2]//2
+    c = b_vols.shape[2] // 2
     plt.imshow(b_vols[:, :, c, col], cmap='gray', interpolation='nearest')
 
 
@@ -119,40 +102,10 @@ def t_stat(y, X, c):
     # calculate bottom half of t statistic
     SE = np.sqrt(MRSS * c.T.dot(npl.pinv(X.T.dot(X)).dot(c)))
     t = c.T.dot(beta) / SE
-    return abs(t)
+    return abs(t[0])
 
 
-#def get_top_100(t,thresh=100/1108800):
-#    """
-#    Parameters
-#    ----------
-#    t: 1D array of t-statistics for each voxel
-#
-#    Returns
-#    -------
-#    1D array of position of voxels in top 100 of t-statistics (all are
-#    positive)
-#    """
-#    a = np.int32(round(len(t) * thresh))
-#    # top_100_voxels = np.argpartition(t, -a)[-a:]
-#    # problem: nans, try
-#    top_100_voxels = np.argpartition(~np.isnan(t),-1)[-a:]
-
-#    return top_100_voxels
-
-
-#def  get_index_4d(top_100_voxels, data):
-#    """
-#    Returns
-#    -------
-#    Indices in terms of 4D array of each voxel in top 20% of t-statistics
-#    """
-#    shape = data[...,-1].shape
-#    axes = np.unravel_index(top_100_voxels, shape)
-#    return zip(axes[0], axes[1], axes[2]) # sequence too large, try n = 32
-
-# Solve the problem by using 32 for next two functions intead
-def get_top_32(t, thresh=100/1108800):
+def get_top_32(t, thresh=100 / 1108800):
     """
     Parameters
     ----------
@@ -163,19 +116,22 @@ def get_top_32(t, thresh=100/1108800):
     1D array of position of voxels in top 32 of t-statistics (all are positive
     """
     a = np.int32(round(len(t) * thresh))
-    top_32_voxels = np.argpartition(~np.isnan(t), -1)[-a:]
-    return top_32_voxels
+    return t.argsort()[-a:][::-1]
 
 
 def get_index_4d(top_32_voxels, data):
     """
+    Parameters
+    ---------
+    top_32_voxels: 1D array of indices of top 32 voxels
+
     Returns
     -------
     Indices in terms of 4D array of each voxel in top 20% of t-statistics
     """
     shape = data[..., -1].shape
     axes = np.unravel_index(top_32_voxels, shape)
-    return zip(axes[0], axes[1], axes[2])
+    return zip(*axes)
 
 
 def plot_single_voxel(data, top_100_voxels):
@@ -185,4 +141,4 @@ def plot_single_voxel(data, top_100_voxels):
     None
     """
     plt.plot(data[get_index_4d(data, top_100_voxels)[0]])
-# fix so only get top voxel
+    linear_modeling/linear_modeling.py

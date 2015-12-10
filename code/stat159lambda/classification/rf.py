@@ -1,6 +1,24 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.cross_validation import KFold
 import numpy as np
+from stat159lambda.config import REPO_HOME_PATH
+
+
+class Classifier:
+    def __init__(self, X, y, max_features='auto', depth=None, n_estimators=400):
+        self.model = RandomForestClassifier(max_features=max_features,
+                                            n_estimators=n_estimators,
+                                            max_depth=None,
+                                            oob_score=False, n_jobs=-1)
+        self.X = X
+        self.y = y
+
+    def train(self):
+        self.model.fit(self.X, self.y)
+
+    def predict(self, new_data):
+        return self.model.predict(new_data)
+
 
 
 def rf_accuracy(X_train, y_train, X_test, y_test, est=1000, feat=10, depth=10):
