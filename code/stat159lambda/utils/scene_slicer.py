@@ -29,7 +29,6 @@ class SceneSlicer:
                 csvfile,
                 fieldnames=['seconds', 'scene', 'day-night', 'int-ext'])
             for row in reader:
-                print row
                 scene_time = int(float(row['seconds']))
                 self.scene_desc[scene_time] = (
                     INTEGER_LABELS['day-night'][row['day-night']],
