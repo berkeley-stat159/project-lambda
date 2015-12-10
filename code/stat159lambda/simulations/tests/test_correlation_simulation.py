@@ -20,5 +20,7 @@ class SimulateInterRunCorrelationTestCases(unittest.TestCase):
         assert_array_equal(
             mock_sim.call_args[0][0],
             '{0}/figures/sim_inter_run.png'.format(REPO_HOME_PATH))
-        runpy = imp.load_source('__main__', 'correlation_simulation.py')
-        self.assertEqual(runpy.__name__, '__main__')
+         # ('{0}/code/stat159/simulations/correlation_simulation.py'.format(REPO_HOME_PATH))
+
+        main_module = imp.load_source('__main__', '../correlation_simulation.py'.format(REPO_HOME_PATH))
+        self.assertEqual(main_module.__name__, '__main__')
