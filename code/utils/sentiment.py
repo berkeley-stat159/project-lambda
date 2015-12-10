@@ -7,6 +7,7 @@ path_to_scene_csv = "../../ds113_study_description/stimulus/task001/annotations/
 
 
 def get_polarity_dict(filename):
+    polarity_dict = {}
     with open(filename, 'rt') as csvfile:
         reader = csv.DictReader(
             csvfile,
@@ -23,6 +24,10 @@ def get_polarity_dict(filename):
             except tb.exceptions.NotTranslated:
                 pass
             sentiment = get_sentiment(translated_blob)
+            polarity_dict[(start, end)] = sentiment
+    print(polarity_dict)
+    return polarity_dict
+
 
 def get_sentiment(blob):
     sentences = blob.sentences
@@ -31,7 +36,6 @@ def get_sentiment(blob):
     for sentence in sentences:
         sentiment_total += sentence.sentiment.polarity
     return float(sentiment_total) / float(sentence_total)
-
 
 
 get_polarity_dict(path_to_scene_csv)
