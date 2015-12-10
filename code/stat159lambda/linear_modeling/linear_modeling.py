@@ -106,9 +106,9 @@ def t_stat(y, X, c):
 
 
 def get_top_32(t, thresh=100 / 1108800):
-    """     
-    Parameters                                                                  
-    ----------                                                                 
+    """
+    Parameters
+    ----------
     t: 1D array of t-statistics for each voxel
 
     Returns
@@ -141,3 +141,4 @@ def plot_single_voxel(data, top_100_voxels):
     None
     """
     plt.plot(data[get_index_4d(data, top_100_voxels)[0]])
+    linear_modeling/linear_modeling.py
