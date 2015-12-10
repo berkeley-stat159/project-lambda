@@ -2,11 +2,10 @@ from __future__ import absolute_import
 from stat159lambda.simulations import correlation_simulation
 from stat159lambda.config import REPO_HOME_PATH
 
-import numpy as np
 import matplotlib
-
-from numpy.testing import assert_almost_equal, assert_array_equal
+from numpy.testing import assert_array_equal
 import unittest
+import imp
 
 try:
     from mock import patch
@@ -21,6 +20,5 @@ class SimulateInterRunCorrelationTestCases(unittest.TestCase):
         assert_array_equal(
             mock_sim.call_args[0][0],
             '{0}/figures/sim_inter_run.png'.format(REPO_HOME_PATH))
-
-# if __name__ == '__main__':
-#     unittest.main()
+        runpy = imp.load_source('__main__', 'correlation_simulation.py')
+        self.assertEqual(runpy.__name__, '__main__')
