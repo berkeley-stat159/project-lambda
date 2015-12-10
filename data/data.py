@@ -1,9 +1,7 @@
 from __future__ import print_function
 from stat159lambda.config import REPO_HOME_PATH
-from Exception import FileNotFoundError
 import hashlib
 import json
-import os
 
 
 def get_hash_values(data_paths):
@@ -20,7 +18,7 @@ def generate_file_md5(filename, blocksize=2**20):
                 if not buf:
                     break
                 m.update(buf)
-    except FileNotFoundError:
+    except OSError:
         print("Oops you don't have this file")
         return
     return m.hexdigest()
@@ -43,7 +41,4 @@ if __name__ == '__main__':
     with open(data_json_path, 'r') as fh:
         DATA_PATHS = json.load(fh)
     data_path = '{0}/data/'.format(REPO_HOME_PATH)
-    if os.path.exists(data_path):
-        check_hashes(get_hash_values(DATA_PATHS))
-    else:
-        print('ERROR: Please make data first.')
+    check_hashes(get_hash_values(DATA_PATHS))
