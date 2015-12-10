@@ -1,4 +1,4 @@
-from stat159lambda.classification import rf
+from stat159lambda.classification.random_forest import rf
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 try:
@@ -12,12 +12,6 @@ def test_prepare():
                   [1, 5, 8], [6, 3, 0], [7, 10, 3], [5, 4, 3], [7, 0, 8]])
     y = np.array([1, 0, 1, 1, 0, 2, 1, 1, 0, 0])
     return X, y
-
-
-def test_cv_rf_accuracy():
-    X, y = test_prepare()
-    assert rf.cv_rf_accuracy(X, y, 2, 2, 2, num_folds=5) > 0
-
 
 # @patch.object(RandomForestClassifier, '__init__')
 # def test_rf_accuracy(mock_rf_init):
