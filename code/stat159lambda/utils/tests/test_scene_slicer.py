@@ -7,9 +7,6 @@ import numpy as np
 
 
 def setup_test():
-    data = np.zeros((2, 2, 2, 50))
-    img = nib.Nifti1Image(data, affine=np.diag([1, 1, 1, 1]))
-    nib.save(img, 'test_data.nii')
     with open('test_scenes.csv', 'w') as csvfile:
         scenewriter = csv.writer(csvfile, delimiter=',', quotechar='"')
         scenewriter.writerow([17.0, 'SAVANNAH', 'DAY', 'EXT'])
@@ -17,11 +14,10 @@ def setup_test():
         scenewriter.writerow([61.0, 'GUMP', 'DAY', 'EXT'])
         scenewriter.writerow([82.0, 'GUMP', 'DAY', 'EXT'])
         scenewriter.writerow([91.0, 'GUMP', 'NIGHT', 'INT'])
-    return scene_slicer.SceneSlicer('test_data.nii', 'test_scenes.csv')
+    return scene_slicer.SceneSlicer('test_scenes.csv')
 
 
 def teardown_test():
-    os.remove('test_data.nii')
     os.remove('test_scenes.csv')
 
 
@@ -37,7 +33,6 @@ def test_constants():
 def test_scene_slicer_init():
     ss = setup_test()
     assert ss.path_to_scene_csv == 'test_scenes.csv'
-    np.testing.assert_array_equal(ss.image.get_data(), np.zeros((2, 2, 2, 50)))
     assert ss.scene_slices == []
     assert ss.scene_desc == {}
     teardown_test()
