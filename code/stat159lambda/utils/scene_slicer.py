@@ -4,7 +4,8 @@ import csv
 import numpy as np
 import json
 import math
-from stat159lambda.config import REPO_HOME_PATH, NUM_OFFSET_VOLUMES, NUM_VOLUMES
+from stat159lambda.config import REPO_HOME_PATH
+from stat159lambda.config import NUM_OFFSET_VOLUMES, NUM_VOLUMES
 
 INTEGER_LABELS = {'day-night': {'DAY': 0,
                                 'NIGHT': 1,

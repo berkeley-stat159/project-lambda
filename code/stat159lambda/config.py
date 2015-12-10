@@ -11,7 +11,6 @@ USE_CACHED_DATA = os.environ.get('STAT159_CACHED_DATA', 'True') == 'True'
 
 NUM_PROCESSES = int(os.environ.get('STAT159_NUM_PROCESSES', 5))
 
-
 # fMRI data specific constants
 
 NUM_OFFSET_VOLUMES = 9
