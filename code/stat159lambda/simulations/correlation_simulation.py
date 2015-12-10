@@ -1,5 +1,7 @@
 import numpy as np
 from scipy import stats
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from stat159lambda.config import REPO_HOME_PATH
 
