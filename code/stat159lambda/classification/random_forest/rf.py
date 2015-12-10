@@ -1,5 +1,4 @@
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.cross_validation import KFold
 import numpy as np
 from stat159lambda.config import REPO_HOME_PATH
 

@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.cross_validation import KFold
 from sklearn.metrics import accuracy_score
 from stat159lambda.classification import design_matrix as dm
-from stat159lambda.classification import rf
+from stat159lambda.classification.random_forest import rf
 from stat159lambda.classification import partition_volumes as pv
 from stat159lambda.config import REPO_HOME_PATH
 from stat159lambda.linear_modeling import linear_modeling as lm
