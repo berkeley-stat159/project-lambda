@@ -1,6 +1,8 @@
 from __future__ import absolute_import, print_function
 from .. import data
+from stat159lambda.config import REPO_HOME_PATH
 import tempfile
+import imp
 
 
 def test_check_hashes():
@@ -16,22 +18,39 @@ def test_check_hashes():
 
 def test_get_hash_values():
     data_paths = {
-        'bold_dico_7Tad2grpbold7Tad': {
-            'sub1': {
-                'runs': [
+        "subjects": [
+            {
+                "runs": [
                     {
-                        'path': 'data/test/file/path/example.file1',
-                        'hash': 'test-hash-value1'
-                    }, {
-                        'path': 'data/test/file/path/example.file2',
-                        'hash': 'test-hash-value2'
+                        "linear": {
+                            "path": "test/file/path/example.file1",
+                            "hash": "test-hash-value1"
+                        },
+                        "rcds": {
+                            "path": "data/raw/sub001/task001_run001/bold_dico_dico_rcds_nl.nii"
+                        }
+                    },
+                    {
+                        "linear": {
+                            "path": "test/file/path/example.file2",
+                            "hash": "test-hash-value2"
+                        },
+                        "rcds": {
+                            "path": "data/raw/sub001/task001_run001/bold_dico_dico_rcds_nl.nii"
+                        }
                     }
                 ]
             }
-        }
+        ]
     }
 
     assert data.get_hash_values(data_paths) == [
         ('test/file/path/example.file1', 'test-hash-value1'),
         ('test/file/path/example.file2', 'test-hash-value2')
     ]
+
+
+def test_main():
+    data_path = '{0}/data/data.py'.format(REPO_HOME_PATH)
+    main_module = imp.load_source('__main__', data_path)
+    assert main_module.__name__ == '__main__'
