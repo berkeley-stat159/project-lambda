@@ -1,21 +1,29 @@
 from __future__ import print_function
+from stat159lambda.config import REPO_HOME_PATH
 import hashlib
 import json
 
 
 def get_hash_values(data_paths):
-    paths = data_paths['bold_dico_7Tad2grpbold7Tad']['sub1']['runs']
-    return [(p['path'].replace('data/', ''), p['hash']) for p in paths]
+    paths = data_paths["subjects"][0]['runs']
+    return [(p['linear']['path'].replace('{0}/data/'.format(REPO_HOME_PATH), ''), p['linear']['hash']) for p in paths]
 
 
 def generate_file_md5(filename, blocksize=2**20):
     m = hashlib.md5()
-    with open(filename, "rb") as f:
-        while True:
-            buf = f.read(blocksize)
-            if not buf:
-                break
-            m.update(buf)
+    try:
+        with open(filename, "rb") as f:
+            while True:
+                buf = f.read(blocksize)
+                if not buf:
+                    break
+                m.update(buf)
+    except OSError:
+        print("Did you make data yet?")
+        return
+    except IOError:
+        print("Did you make data yet?")
+        return
     return m.hexdigest()
 
 
@@ -32,6 +40,8 @@ def check_hashes(d):
 
 
 if __name__ == '__main__':
-    with open('data_path.json', 'r') as fh:
+    data_json_path = '{0}/data/data_path.json'.format(REPO_HOME_PATH)
+    with open(data_json_path, 'r') as fh:
         DATA_PATHS = json.load(fh)
+    data_path = '{0}/data/'.format(REPO_HOME_PATH)
     check_hashes(get_hash_values(DATA_PATHS))
