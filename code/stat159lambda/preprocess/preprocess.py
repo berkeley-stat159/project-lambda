@@ -24,7 +24,7 @@ def concatenate_runs(subj_num):
             data = img.get_data()
             if j == 0:
                 run_data.append(data[..., :-4])
-            elif j >= 1 and j <= 6:
+            elif j >= 1 and j <= NUM_RUNS - 2:
                 run_data.append(data[..., 4:-4])
             else:
                 run_data.append(data[..., 4:])
@@ -78,7 +78,8 @@ def merge_2d_data(data_slices):
 def get_affine():
     affine_path = '{0}/data/affine.npy'.format(REPO_HOME_PATH)
     if not exists(affine_path):
-        img = nib.load(dp.get_raw_path(1, 1))
+        subj_num, run_num = 1, 1
+        img = nib.load(dp.get_raw_path(subj_num, run_num))
         affine = img.get_affine()
         np.save(affine_path, affine)
         return affine
