@@ -5,10 +5,10 @@ class Subject:
     """
     Subject class in which each instance represents one subject. Each subject
     has attributes:
-    1. id : int
-    2. gender : string
-    3. age_range : string
-    4. forrest_seen_count : int
+    (1) id : int
+    (2) gender : string
+    (3) age_range : string
+    (4) forrest_seen_count : int
 
     Parameters
     ----------
