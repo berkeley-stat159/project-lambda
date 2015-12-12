@@ -9,7 +9,7 @@ import sys
 from os.path import exists
 import sharedmem as sm
 import gc
-from stat159lambda.config import REPO_HOME_PATH, RUN_DIVISIONS, NUM_VOXELS, NUM_RUNS, USE_CACHED_DATA
+from stat159lambda.config import REPO_HOME_PATH, RUN_DIVISIONS, NUM_VOXELS, NUM_RUNS, USE_CACHED_DATA, SUBJECTS
 from stat159lambda.utils import data_path as dp
 from numpy.core.umath_tests import inner1d
 
@@ -50,7 +50,8 @@ def calculate_and_save_correlation(subj_1_num, subj_2_num):
 
 
 def main():
-    calculate_and_save_correlation(1, 2)
+    for subj_1_num, subj_2_num in itertools.combinations(SUBJECTS, 2):
+        calculate_and_save_correlation(subj_1_num, subj_2_num)
 
 
 if __name__ == '__main__':
