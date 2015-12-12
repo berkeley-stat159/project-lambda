@@ -10,6 +10,8 @@ from os import path
 import sharedmem as sm
 import gc
 from stat159lambda.config import REPO_HOME_PATH, RUN_DIVISIONS, NUM_VOXELS, NUM_RUNS
+from stat159lambda.utils import data_path as dp 
+from numpy.core.umath_tests import inner1d
 
 INCORRECT_NUM_ARGS_MESSAGE = 'invalid number of arguments: specify alignment type, subject1 and subject2'
 ILLEGAL_ALIGNMENT_ARG_MESSAGE = 'alignment argument must be either <rcds>, <linear>, <non_linear>'
@@ -37,24 +39,26 @@ ILLEGAL_SUBJECTS_ARG_MESSAGE = 'subject arguments must be integers corresponding
 #                                                 shared_subject2[
 #                                                     i, :])[0]
 
+def pearson_r(X, Y):
+    X_centered = X - np.mean(X, axis=1)
+    Y_centered = Y - np.mean(Y, axis=1)
+    return inner1d(X_centered, Y_centered) / (np.linalg.norm(X_centered, axis=1) * np.linalg.norm(Y_centered, axis=1))
+
 
 def intra_run_correlation(data_a, data_b):
-    return np.array([stats.pearsonr(data_a[i, :], data_b[i, :])[0]
+    return np.array([pearson_r(data_a[i, :], data_b[i, :])[0]
                      for i in range(NUM_VOXELS)])
 
 
 def correlation(subj_a_data, subj_b_data):
-    run_split_a_data = np.split(subj_a_data, RUN_DIVISIONS[:-1])
-    del subj_a_data
-    run_split_b_data = np.split(subj_b_data, RUN_DIVISIONS[:-1])
-    del subj_b_data
-    gc.collect()
+    run_split_a_data = np.split(subj_a_data, RUN_DIVISIONS[:-1], axis=1)
+    run_split_b_data = np.split(subj_b_data, RUN_DIVISIONS[:-1], axis=1)
     correlations = np.zeros(NUM_VOXELS)
-    for run_a, run_b in zip(run_split_a_data, run_split_b_data):
+    for run_a, run_b in itertools.izip(run_split_a_data, run_split_b_data):
         correlations += intra_run_correlation(run_a, run_b)
     correlations /= NUM_RUNS
     return correlations
-    
+
 # def check_command_line_arguments(arguments):
 #     if len(arguments) != 4:
 #         raise ValueError(INCORRECT_NUM_ARGS_MESSAGE)
