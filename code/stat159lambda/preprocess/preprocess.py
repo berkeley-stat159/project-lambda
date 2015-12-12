@@ -1,19 +1,19 @@
 from __future__ import division, print_function
 import json
 import sys
+import gc
 import nibabel as nib
 import numpy as np
 from glob import glob
 from os.path import exists
 from scipy.ndimage import filters
 from stat159lambda.config import REPO_HOME_PATH, USE_CACHED_DATA
-from stat159lambda.config import NUM_RUNS, NUM_VOLUMES
+from stat159lambda.config import NUM_RUNS, NUM_VOLUMES, SUBJECTS
 from stat159lambda.utils import data_path as dp
 
-
-SUBJECTS = [1, 2, 3, 5, 6]
 INTRA_SUBJECT_SMOOTH_MM = 4
 INTER_SUBJECT_SMOOTH_MM = 8
+
 
 def concatenate_runs(subj_num):
     npy_file_name = dp.get_concatenated_path(subj_num)
@@ -96,10 +96,15 @@ def convert_fwhm_mm_to_sd_voxel(fwhm):
 def main():
     for subj_num in SUBJECTS:
         concatenate_runs(subj_num)
+        gc.collect()
         gaussian_smooth_subj(subj_num, INTRA_SUBJECT_SMOOTH_MM)
+        gc.collect()
         gaussian_smooth_subj(subj_num, INTER_SUBJECT_SMOOTH_MM)
+        gc.collect()
         reshape_smoothed_to_2d(subj_num, INTRA_SUBJECT_SMOOTH_MM)
+        gc.collect()
         reshape_smoothed_to_2d(subj_num, INTER_SUBJECT_SMOOTH_MM)
+        gc.collect()
 
 
 if __name__ == '__main__':
