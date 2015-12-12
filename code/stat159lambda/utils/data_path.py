@@ -42,7 +42,7 @@ def get_concatenated_path(subj_num):
 def get_smoothed_path(subj_num, fwhm_mm):
     """
     Derives the absolute path to the smoothed data for a particular subject and
-    particular smoothing and particular full width half maximum smoothed version
+    particular full width half maximum smoothed version
 
     Parameters
     ----------
