@@ -12,10 +12,6 @@ import matplotlib.pyplot as plt
 PERCENTILES = [0, 25, 50, 75, 90, 95, 99, 99.5, 100]
 
 
-def plot_correlation_histogram(subj_1_num, subj_2_num):
-    correlations = np.load(dp.get_correlation_path(subj_1_num, subj_2_num))
-
-
 def get_pairwise_correlations():
     subject_pairs = itertools.combinations(SUBJECTS, 2)
     return [np.load(dp.get_correlation_path(subj_a, subj_b))
