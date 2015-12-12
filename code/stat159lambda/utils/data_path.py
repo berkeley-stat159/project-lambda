@@ -13,7 +13,7 @@ def get_raw_path(subj_num, run_num):
 
 def get_concatenated_path(subj_num):
     return '{0}/data/processed/sub{1}_rcds.npy'.format(REPO_HOME_PATH,
-                                                        subj_num)
+                                                       subj_num)
 
 
 def get_smoothed_path(subj_num, fwhm_mm):
@@ -23,4 +23,13 @@ def get_smoothed_path(subj_num, fwhm_mm):
 
 def get_2d_path(subj_num):
     return '{0}/data/processed/sub{1}_rcds_2d.npy'.format(REPO_HOME_PATH,
-                                                           subj_num)
+                                                          subj_num)
+
+
+def get_smoothed_path_2d(subj_num, fwhm_mm):
+    return '{0}/data/processed/sub{1}_rcds_smoothed_{2}_mm_2d.npy'.format(
+        REPO_HOME_PATH, subj_num, fwhm_mm)
+
+
+def get_scene_csv():
+    return '{0}/data/scenes.csv'.format(REPO_HOME_PATH)
