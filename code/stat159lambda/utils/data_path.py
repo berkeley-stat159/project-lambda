@@ -21,9 +21,14 @@ def get_smoothed_path(subj_num, fwhm_mm):
         REPO_HOME_PATH, subj_num, fwhm_mm)
 
 
-def get_smoothed_path_2d(subj_num, fwhm_mm):
+def get_smoothed_2d_path(subj_num, fwhm_mm):
     return '{0}/data/processed/sub{1}_rcds_smoothed_{2}_mm_2d.npy'.format(
         REPO_HOME_PATH, subj_num, fwhm_mm)
+
+
+def get_correlation_path(subj_1_num, subj_2_num):
+    return '{0}/data/processed/sub{1}_sub{2}_correlation.npy'.format(
+        REPO_HOME_PATH, subj_1_num, subj_2_num)
 
 
 def get_2d_path(subj_num):
