@@ -2,11 +2,9 @@ from __future__ import print_function, division
 import nibabel as nib
 import numpy as np
 from scipy import stats
-from multiprocessing import Process
 import itertools
 import sys
 from os.path import exists
-import sharedmem as sm
 import gc
 from stat159lambda.config import REPO_HOME_PATH, RUN_DIVISIONS, NUM_VOXELS
 from stat159lambda.config import NUM_RUNS, USE_CACHED_DATA, SUBJECTS
