@@ -44,10 +44,10 @@ def reshape_data_to_2d(data_4d):
 
 
 def reshape_smoothed_to_2d(subj_num, fwhm_mm):
-    smoothed_path = get_smoothed_path(subj_num, fwhm_mm)
+    smoothed_path = dp.get_smoothed_path(subj_num, fwhm_mm)
     smoothed_path_2d = smoothed_path.replace('.npy', '_2d.npy')
-    if not exists(file_name_2d + '.npy') or not USE_CACHED_DATA:
-        if not exists(smoothed_path(subj_num, fwhm_mm)):
+    if not exists(smoothed_path_2d) or not USE_CACHED_DATA:
+        if not exists(smoothed_path):
             raise ValueError(
                 '{0} does not exists, thus cannot be reshaped'.format(
                     smoothed_path))
