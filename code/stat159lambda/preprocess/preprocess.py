@@ -89,7 +89,7 @@ def get_affine():
 def gaussian_smooth_subj(subj_num, fwhm_mm):
     smoothed_data_path = dp.get_smoothed_path(subj_num, fwhm_mm)
     if not exists(smoothed_data_path) or not USE_CACHED_DATA:
-        data = np.load(dp.get_concatenated_path(subj_num)).astype(float)
+        data = np.load(dp.get_concatenated_path(subj_num)).astype(np.float32)
         smoothed_data = apply_gaussian_smooth(data, fwhm_mm)
         del data
         np.save(smoothed_data_path, smoothed_data)
