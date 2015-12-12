@@ -1,18 +1,18 @@
 from __future__ import division, print_function
 import json
 import sys
+import gc
 import nibabel as nib
 import numpy as np
 from glob import glob
 from os.path import exists
 from scipy.ndimage import filters
-from multiprocessing import Pool
 from stat159lambda.config import REPO_HOME_PATH, USE_CACHED_DATA
-from stat159lambda.config import NUM_RUNS, NUM_VOLUMES
+from stat159lambda.config import NUM_RUNS, NUM_VOLUMES, SUBJECTS
 from stat159lambda.utils import data_path as dp
 
-INCORRECT_NUM_ARGS_MESSAGE = 'Invalid number of arguments: specify alignment type'
-ILLEGAL_ARG_MESSAGE = 'preprocess.py must be provided with alignment argument'
+INTRA_SUBJECT_SMOOTH_MM = 4
+INTER_SUBJECT_SMOOTH_MM = 8
 
 
 def concatenate_runs(subj_num):
@@ -35,44 +35,21 @@ def concatenate_runs(subj_num):
         print('Using cached version of {0}'.format(npy_file_name))
 
 
-def reshape_data_to_2d(data_4d):
-    data_chunks = partition_4d_data(data_4d)
-    p = Pool(cf.NUM_PROCESSES)
-    reshaped_chunks = p.imap(reshape_4d_data, data_chunks)
-    data_2d = merge_2d_data(reshaped_chunks)
-    return data_2d
-
-
 def reshape_smoothed_to_2d(subj_num, fwhm_mm):
-    smoothed_path = get_smoothed_path(subj_num, fwhm_mm)
+    smoothed_path = dp.get_smoothed_path(subj_num, fwhm_mm)
     smoothed_path_2d = smoothed_path.replace('.npy', '_2d.npy')
-    if not exists(file_name_2d + '.npy') or not USE_CACHED_DATA:
-        if not exists(smoothed_path(subj_num, fwhm_mm)):
+    if not exists(smoothed_path_2d) or not USE_CACHED_DATA:
+        if not exists(smoothed_path):
             raise ValueError(
                 '{0} does not exists, thus cannot be reshaped'.format(
                     smoothed_path))
         data = np.load(smoothed_path)
-        data_2d = reshape_data_to_2d(data)
+        data_2d = np.reshape(data, (-1, data.shape[-1]))
         del data
         np.save(smoothed_path.replace('.npy', '_2d.npy'), data_2d)
         print('Saved {0}'.format(smoothed_path_2d))
     else:
         print('Using cached version of {0}'.format(smoothed_path_2d))
-
-
-def partition_4d_data(data):
-    num_partitions = cf.NUM_PROCESSES
-    partition_indices = [(NUM_VOLUMES // num_partitions) * i
-                         for i in range(1, num_partitions)]
-    return np.split(data, partition_indices, axis=3)
-
-
-def reshape_4d_data(data):
-    return np.reshape(data, (-1, data.shape[-1]))
-
-
-def merge_2d_data(data_slices):
-    return np.hstack(tuple(data_slices))
 
 
 def get_affine():
@@ -116,11 +93,19 @@ def convert_fwhm_mm_to_sd_voxel(fwhm):
     return convert_fwhm_to_sigma(fwhm) / get_voxel_lengths(get_affine())
 
 
+def main():
+    for subj_num in SUBJECTS:
+        concatenate_runs(subj_num)
+        gc.collect()
+        gaussian_smooth_subj(subj_num, INTRA_SUBJECT_SMOOTH_MM)
+        gc.collect()
+        gaussian_smooth_subj(subj_num, INTER_SUBJECT_SMOOTH_MM)
+        gc.collect()
+        reshape_smoothed_to_2d(subj_num, INTRA_SUBJECT_SMOOTH_MM)
+        gc.collect()
+        reshape_smoothed_to_2d(subj_num, INTER_SUBJECT_SMOOTH_MM)
+        gc.collect()
+
+
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        raise ValueError(INCORRECT_NUM_ARGS_MESSAGE)
-    alignment = sys.argv[1]
-    if alignment not in ['linear', 'non_linear', 'rcds']:
-        raise ValueError(ILLEGAL_ARG_MESSAGE)
-    concatenate_runs(alignment)
-    reshape_data_to_2d(alignment)
+    main()
