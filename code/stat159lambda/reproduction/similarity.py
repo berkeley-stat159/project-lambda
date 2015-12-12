@@ -1,5 +1,4 @@
-from __future__ import print_function
-from __future__ import division
+from __future__ import print_function, division
 import nibabel as nib
 import numpy as np
 from scipy import stats
@@ -9,13 +8,10 @@ import sys
 from os.path import exists
 import sharedmem as sm
 import gc
-from stat159lambda.config import REPO_HOME_PATH, RUN_DIVISIONS, NUM_VOXELS, NUM_RUNS, USE_CACHED_DATA, SUBJECTS
+from stat159lambda.config import REPO_HOME_PATH, RUN_DIVISIONS, NUM_VOXELS
+from stat159lambda.config import NUM_RUNS, USE_CACHED_DATA, SUBJECTS
 from stat159lambda.utils import data_path as dp
 from numpy.core.umath_tests import inner1d
-
-INCORRECT_NUM_ARGS_MESSAGE = 'invalid number of arguments: specify alignment type, subject1 and subject2'
-ILLEGAL_ALIGNMENT_ARG_MESSAGE = 'alignment argument must be either <rcds>, <linear>, <non_linear>'
-ILLEGAL_SUBJECTS_ARG_MESSAGE = 'subject arguments must be integers corresponding to subject numbers'
 
 
 def pearson_r(X, Y):
