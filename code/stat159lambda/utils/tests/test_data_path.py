@@ -32,7 +32,7 @@ def test_get_concatenated_path():
 
 
 def test_get_smoothed_path():
-	paths = [dp.get_smooth_path(subject, FWHM_MM) for subject in SUBJECTS]
+	paths = [dp.get_smoothed_path(subject, FWHM_MM) for subject in SUBJECTS]
 	assert paths[0] == '{0}/data/processed/sub1_rcds_smoothed_8_mm.npy'.format(
         REPO_HOME_PATH)
 	assert paths[1] == '{0}/data/processed/sub2_rcds_smoothed_8_mm.npy'.format(
@@ -46,7 +46,7 @@ def test_get_smoothed_path():
 
 
 def test_get_smoothed_2d_path():
-	paths = [dp.get_smooth_2d_path(subject, FWHM_MM) for subject in SUBJECTS]
+	paths = [dp.get_smoothed_2d_path(subject, FWHM_MM) for subject in SUBJECTS]
 	assert paths[0] == '{0}/data/processed/sub1_rcds_smoothed_8_mm_2d.npy'.format(
         REPO_HOME_PATH)
 	assert paths[1] == '{0}/data/processed/sub2_rcds_smoothed_8_mm_2d.npy'.format(
