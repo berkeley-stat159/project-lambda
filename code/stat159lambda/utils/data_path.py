@@ -34,7 +34,7 @@ def get_concatenated_path(subj_num):
     path : string
     """
     return '{0}/data/processed/sub{1}_rcds.npy'.format(REPO_HOME_PATH,
-                                                        subj_num)
+                                                       subj_num)
 
 
 def get_smoothed_path(subj_num, fwhm_mm):
@@ -127,3 +127,7 @@ def get_correlation_hist_path(aggregation):
     """
     return '{0}/figures/{1}_correlation_histogram.png'.format(REPO_HOME_PATH,
                                                                 aggregation)
+
+
+def get_scene_csv():
+    return '{0}/data/scenes.csv'.format(REPO_HOME_PATH)
