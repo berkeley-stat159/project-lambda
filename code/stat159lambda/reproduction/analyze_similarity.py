@@ -102,8 +102,9 @@ def correlation_brain_image():
                          nan=False),
         VOXEL_DIMENSIONS)
     image = correlations_3d[:, :, 24]
+    image += image.min()
     outside_brain_mask = np.logical_not(bm.get_brain_mask())[:, :, 24]
-    image[outside_brain_mask] = -10
+    image[outside_brain_mask] = 0
     hot_mask = image >= np.percentile(get_correlations('mean', nan=True), 95)
     hot_pixels = np.zeros_like(image, dtype=np.float)
     hot_pixels[hot_mask] = image[hot_mask]

@@ -1,9 +1,12 @@
 import numpy as np
 import os
 from stat159lambda.config import REPO_HOME_PATH, NUM_OFFSET_VOLUMES, NUM_VOLUMES
+from stat159lambda.utils import scene_slicer as ss 
 
 def partition_volumes():
-	volume_indices = range(NUM_VOLUMES - NUM_OFFSET_VOLUMES)
+	volume_indices = np.array(range(NUM_VOLUMES - NUM_OFFSET_VOLUMES))
+	clean_slice_mask = ss.SceneSlicer().get_clean_slice_mask()
+	volume_indices = volume_indices[clean_slice_mask]
 	np.random.shuffle(volume_indices)
 	num_train = int(.8*len(volume_indices))
 	train_indices = volume_indices[:num_train]

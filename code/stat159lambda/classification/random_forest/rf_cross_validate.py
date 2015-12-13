@@ -11,14 +11,15 @@ from stat159lambda.utils import data_path as dp
 
 
 voxels_sorted_by_t_statistic = lm.VoxelExtractor(1, 'int-ext').t_stat()
-num_features_values = range(100, NUM_VOXELS/100, 100)
+num_features_values = [200, 400, 600, 1000, 1500, 2000, 3000, 5000]
+design_matrix = dm.DesignMatrix(dp.get_smoothed_2d_path(1, 4))
+train_volume_indices = pv.get_train_indices()
+cv_values = []
 for num_features in num_features_values:
-	voxel_feature_indices = voxels_sorted_by_t_statistic[:num_features_values]
-	design_matrix = dm.DesignMatrix(dp.get_smoothed_2d_path(1, 4),
-	    pv.get_train_indices(), voxel_feature_indices)
+	voxel_feature_indices = voxels_sorted_by_t_statistic[:num_features]
 
-	X_train = design_matrix.get_design_matrix()
-	y_train = np.array(design_matrix.get_labels())
+	X_train = design_matrix.get_design_matrix(train_volume_indices, voxel_feature_indices)
+	y_train = np.array(design_matrix.get_labels(train_volume_indices))
 
 	cv_accuracies = []
 	for train, test in KFold(len(X_train), 5):
@@ -31,5 +32,7 @@ for num_features in num_features_values:
 		y_predicted = model.predict(X_cv_test)
 		cv_accuracies.append(accuracy_score(y_predicted, y_cv_test))
 
-	print(np.mean(cv_accuracies))
+	cv_values.append(np.mean(cv_accuracies))
+
+np.save('cv_values', cv_values)
 
