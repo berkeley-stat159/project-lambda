@@ -108,3 +108,19 @@ def get_2d_path(subj_num):
     """
     return '{0}/data/processed/sub{1}_rcds_2d.npy'.format(REPO_HOME_PATH,
                                                            subj_num)
+
+def get_correlation_hist_path(aggregation):
+    """
+    Derives the absolute path to the correlations calculated by using either
+    the means or pooled data
+
+    Parameters
+    ----------
+    aggregation : string
+
+    Returns
+    -------
+    path : string
+    """
+    return '{0}/figures/{1}_correlation_histogram.png'.format(REPO_HOME_PATH,
+                                                                aggregation)
