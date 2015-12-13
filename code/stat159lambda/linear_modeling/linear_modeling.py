@@ -7,7 +7,7 @@ import nibabel as nib
 import stat159lambda.utils.scene_slicer as ssm
 import stat159lambda.utils.data_path as dp
 from stat159lambda.config import REPO_HOME_PATH
-
+from scipy.stats import t
 
 class VoxelExtractor:
 
@@ -22,6 +22,10 @@ class VoxelExtractor:
         self.data = np.reshape(data, (-1, data.shape[-1]))
         self.design = None
         self.B = None
+
+    def lol(self):
+        # t_vals = np.zeroes(self.data[0])
+        print(t.stats(self.data[0, :]))
 
     def get_design_matrix(self):
         """
@@ -107,14 +111,12 @@ class VoxelExtractor:
         """
         if self.design is None:
             self.get_design_matrix()
-        # Make sure y, X, c are all arrays
         y = np.asarray(self.data.T)
         X = np.asarray(self.design)
-        c = [1, 0, 0]
-        c = np.atleast_2d(c).T  # As column vector
+        c = [0, 0, 1]
+        c = np.atleast_2d(c).T
         beta = npl.pinv(X).dot(y)
         fitted = X.dot(beta)
-        # Residual error
         errors = y - fitted
         RSS = (errors**2).sum(axis=0)
         df = X.shape[0] - npl.matrix_rank(X)
@@ -142,8 +144,7 @@ class VoxelExtractor:
 
 
 ve = VoxelExtractor(1, 'int-ext')
-ve.get_design_matrix()
-print("got design matrix")
-ve.get_betas_Y()
-a = ve.t_stat()[10000]
-ve.plot_single_voxel(a)
+# ve.lol()
+for i in range(100):
+    a = ve.t_stat()[i]
+    ve.plot_single_voxel(a)
