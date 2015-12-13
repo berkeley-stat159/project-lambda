@@ -25,7 +25,7 @@ class Classifier:
     -------
     None
     """
-    def __init__(self, X, y, C=1.0, kernel='rbf', degree=2):
+    def __init__(self, X, y, C=.001, kernel='linear', degree=2):
         if kernel == 'linear':
             self.model = LinearSVC(C=C)
         else:
@@ -35,30 +35,30 @@ class Classifier:
 
 
     def train(self):
-    """
-    Classifier method that fits the SVM model according to the given training
-    data X
+        """
+        Classifier method that fits the SVM model according to the given training
+        data X
 
-    Parameters
-    ----------
-    None
+        Parameters
+        ----------
+        None
 
-    Returns
-    -------
-    self : object
-    """
+        Returns
+        -------
+        self : object
+        """
         self.model.fit(self.X, self.y)
 
     def predict(self, new_data):
-    """
-    Performs classification on samples in new_data
+        """
+        Performs classification on samples in new_data
 
-    Parameters
-    ----------
-    new_data : array
+        Parameters
+        ----------
+        new_data : array
 
-    Returns
-    -------
-    pred: array that contains class labels for samples in new_data
-    """
+        Returns
+        -------
+        pred: array that contains class labels for samples in new_data
+        """
         return self.model.predict(new_data)
