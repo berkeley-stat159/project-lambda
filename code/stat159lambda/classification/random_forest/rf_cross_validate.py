@@ -11,7 +11,7 @@ from stat159lambda.utils import data_path as dp
 
 
 voxels_sorted_by_t_statistic = lm.VoxelExtractor(1, 'int-ext').t_stat()
-num_features_values = [200, 400, 600, 1000, 1500, 2000, 3000, 5000]
+num_features_values = [200, 400, 600, 1000, 1500, 2000, 3000, 5000, 10000]
 design_matrix = dm.DesignMatrix(dp.get_smoothed_2d_path(1, 4))
 train_volume_indices = pv.get_train_indices()
 cv_values = []
