@@ -1,4 +1,4 @@
-ss[11pt]{article}
+\documentclass[11pt]{article}
 
 \usepackage[margin=0.75in]{geometry}
 \usepackage{graphicx}
@@ -340,7 +340,7 @@ correlation for most voxels.
 From those correlation coefficient distributions, we calculated the 
 correlation coefficients at the 0, 25, 50, 75, 90, 95, 99, 99.5, and 100\%
 percentiles, as can be seen in the table below.
-\begin{table}[h!]
+\begin{table}[ht]
   \centering
   \caption{Our Results}
   \label{tab:table1}
@@ -353,10 +353,10 @@ percentiles, as can be seen in the table below.
   \end{tabular}
 \end{table}
 
-\begin{table}[h!]
+\begin{table}[ht]
   \centering
   \caption{Results reported by Hanke et al.}
-  \label{tab:table1}
+  \label{tab:table2}
   \begin{tabular}{cccccccccc}
     percentile & 0 & 25 & 50 & 75 & 90 & 95 & 99 & 99.5 & 100\\
     \hline
@@ -623,7 +623,7 @@ are a relatively small number of participants, only 20, since fMRI is
 expensive, so the predictive ability of that study would be rather limited.
 
 
-\bibliography{project}
+\bibliography{project.bib}
 
 \end{document}
 
