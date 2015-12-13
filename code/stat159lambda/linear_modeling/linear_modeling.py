@@ -6,6 +6,7 @@ import numpy.linalg as npl
 import nibabel as nib
 import stat159lambda.utils.scene_slicer as ssm
 import stat159lambda.utils.data_path as dp
+from stat159lambda.config import REPO_HOME_PATH
 
 
 class VoxelExtractor:
@@ -17,7 +18,10 @@ class VoxelExtractor:
         data_path = "/Users/Jordeen/stat159/jodreen-work/project-lambda/data/raw/sub001/task001_run001/bold_dico_dico_rcds_nl.nii"
         data = nib.load(data_path).get_data()
         data = data[:, :, :, 400:]
+        # Data is shaped as number of voxels by time
         self.data = np.reshape(data, (-1, data.shape[-1]))
+        self.design = None
+        self.B = None
 
     def get_design_matrix(self):
         """
@@ -26,21 +30,22 @@ class VoxelExtractor:
         Design matrix with 3 columns, including the column of interest,
         the linear drift column, and the column of ones
         """
-        scene_path = dp.get_scene_csv()
-        ss = ssm.SceneSlicer(scene_path)
-        if self.interest_col_str == "int-ext":
-            interest_col_ind = 1
-        elif self.interest_col_str == "day-night":
-            interest_col_ind = 0
-        else:
-            print("Incorrect interest column name: please use either 'int-ext' or 'day-night'")
-        interest_col = ss.get_scene_slices()[interest_col_ind]
-        n_trs = self.data.shape[-1]
-        design = np.ones((n_trs, 3))
-        design[:, 1] = np.linspace(-1, 1, n_trs)
-        design[:, 2] = interest_col[400:451]
-        self.design = design
-        return design
+        if self.design is None:
+            scene_path = dp.get_scene_csv()
+            ss = ssm.SceneSlicer(scene_path)
+            if self.interest_col_str == "int-ext":
+                interest_col_ind = 1
+            elif self.interest_col_str == "day-night":
+                interest_col_ind = 0
+            else:
+                print("Incorrect interest column name: please use either 'int-ext' or 'day-night'")
+            interest_col = ss.get_scene_slices()[interest_col_ind]
+            n_trs = self.data.shape[-1]
+            design = np.ones((n_trs, 3))
+            design[:, 1] = np.linspace(-1, 1, n_trs)
+            design[:, 2] = interest_col[400:451]
+            self.design = design
+        return self.design
 
     def plot_design_matrix(self):
         """
@@ -48,8 +53,14 @@ class VoxelExtractor:
         -------
         None
         """
-        plt.imshow(self.X, aspect=0.1, cmap='gray', interpolation='nearest')
+        if self.design is None:
+            self.get_design_matrix()
+        design_fig = plt.gcf()
+        plt.imshow(self.design, aspect=0.1, cmap='gray', interpolation='nearest')
         plt.xticks([])
+        design_fig_path = '{0}/figures/design_fig_{1}.png'.format(REPO_HOME_PATH, self.interest_col_str)
+        design_fig.savefig(design_fig_path, dpi=100)
+        plt.clf()
 
     def get_betas_Y(self):
         """
@@ -57,10 +68,11 @@ class VoxelExtractor:
         -------
         B: 2D array, p x B, the number of voxels
         """
-        # Y = np.reshape(data, (-1, data.shape[-1]))
-        Y = self.data
-        self.B = npl.pinv(self.design).dot(Y.T)
-        print(self.B.shape)
+        if self.design is None:
+            self.get_design_matrix()
+        if not self.B:
+            Y = self.data
+            self.B = npl.pinv(self.design).dot(Y.T)
         return self.B
 
     def get_betas_4d(B, data):
@@ -71,7 +83,7 @@ class VoxelExtractor:
         """
         return np.reshape(B.T, data.shape[:-1] + (-1, ))
 
-    def plot_betas(b_vols, col):
+    def plot_betas(self, b_vols, col):
         """
         Parameters
         ----------
@@ -93,60 +105,45 @@ class VoxelExtractor:
         and identical normal distributions around zero for each $i$ in
         $\e_i$ (i.i.d).
         """
+        if self.design is None:
+            self.get_design_matrix()
         # Make sure y, X, c are all arrays
         y = np.asarray(self.data.T)
         X = np.asarray(self.design)
         c = [1, 0, 0]
         c = np.atleast_2d(c).T  # As column vector
-        # Calculate the parameters - b hat
         beta = npl.pinv(X).dot(y)
-        # The fitted values - y hat
         fitted = X.dot(beta)
         # Residual error
         errors = y - fitted
-        print("CALCULATING RSS NOWWWWWWWWWWWW")
-        # Residual sum of squares
         RSS = (errors**2).sum(axis=0)
-        # Degrees of freedom is the number of observations n minus the number
-        # of independent regressors we have used.  If all the regressor
-        # columns in X are independent then the (matrix rank of X) == p
-        # (where p the number of columns in X). If there is one column that
-        # can be expressed as a linear sum of the other columns then
-        # (matrix rank of X) will be p - 1 - and so on.
         df = X.shape[0] - npl.matrix_rank(X)
-        # Mean residual sum of squares
         MRSS = RSS / df
         # calculate bottom half of t statistic
         SE = np.sqrt(MRSS * c.T.dot(npl.pinv(X.T.dot(X)).dot(c)))
-        print(SE[np.where(SE == 0)])
+        SE[SE == 0] = np.amin(SE[SE != 0])
         t = c.T.dot(beta) / SE
         self.t_values = abs(t[0])
         self.t_indices = np.array(self.t_values).argsort()[::-1][:self.t_values.size]
+        return self.t_indices
 
-    def get_index_4d(top_32_voxels, data):
-        """
-        Parameters
-        ---------
-        top_32_voxels: 1D array of indices of top 32 voxels
-
-        Returns
-        -------
-        Indices in terms of 4D array of each voxel in top 20% of t-statistics
-        """
-        shape = data[..., -1].shape
-        axes = np.unravel_index(top_32_voxels, shape)
-        return zip(*axes)
-
-    def plot_single_voxel(data, top_100_voxels):
+    def plot_single_voxel(self, voxel_index):
         """
         Returns
         -------
         None
         """
-        plt.plot(data[get_index_4d(data, top_100_voxels)[0]])
+        voxel_img = plt.gcf()
+        plt.plot(self.data[voxel_index, :])
+        print(self.data[voxel_index, :])
+        voxel_img_path = '{0}/figures/voxel_{1}.png'.format(REPO_HOME_PATH, voxel_index)
+        voxel_img.savefig(voxel_img_path, dpi=100)
+        plt.clf()
+
 
 ve = VoxelExtractor(1, 'int-ext')
 ve.get_design_matrix()
 print("got design matrix")
 ve.get_betas_Y()
-print(ve.t_stat())
+a = ve.t_stat()[10000]
+ve.plot_single_voxel(a)
