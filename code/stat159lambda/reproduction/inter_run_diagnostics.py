@@ -8,6 +8,19 @@ from stat159lambda.config import REPO_HOME_PATH
 
 
 def calc_vol_rms_diff(data_file_path):
+    """
+    Finds the difference between data[n+1] and data[n] for all elements in data
+    array to calculate the root mean squares. Does not include the data points
+    when they are tuning in the first 17 seconds.
+
+    Parameters
+    ----------
+    data_file_path : string
+
+    Returns
+    -------
+    vol_rms_diff : array 
+    """
     data = np.load(open(data_file_path))
     diff_data = np.diff(data, axis=1)
     del data
@@ -17,6 +30,19 @@ def calc_vol_rms_diff(data_file_path):
 
 
 def save_plot(vol_rms_diff, subj_num):
+    """
+    Plots the root mean square differences for a particular subject and saves
+    that plot into the figures folder
+
+    Parameters
+    ----------
+    vol_rms_diff : array
+    subj_num : int
+
+    Returns
+    -------
+    None
+    """
     plt.plot(vol_rms_diff)
     plt.savefig('{0}/figures/subj{1}_vol_rms_diff.png'.format(
         REPO_HOME_PATH, subj_num))
