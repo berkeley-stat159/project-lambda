@@ -10,7 +10,7 @@ from stat159lambda.linear_modeling import linear_modeling as lm
 from stat159lambda.utils import data_path as dp
 
 
-voxels_sorted_by_t_statistic = lm.get_voxels_by_t_statistic('int-ext', 1)
+voxels_sorted_by_t_statistic = lm.VoxelExtractor(1, 'int-ext').t_stat()
 num_features_values = range(100, NUM_VOXELS/100, 100)
 for num_features in num_features_values:
 	voxel_feature_indices = voxels_sorted_by_t_statistic[:num_features_values]
@@ -31,5 +31,5 @@ for num_features in num_features_values:
 		y_predicted = model.predict(X_cv_test)
 		cv_accuracies.append(accuracy_score(y_predicted, y_cv_test))
 
-	print np.mean(cv_accuracies)
+	print(np.mean(cv_accuracies))
 
