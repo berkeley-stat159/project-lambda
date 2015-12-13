@@ -5,10 +5,10 @@ import re
 # Python specific constants
 path_to_file = os.path.realpath(__file__)
 
-if os.environ.get('TEST') and os.environ['TEST'] == 1:
-    REPO_HOME_PATH = re.sub(r'/code/stat159lambda/config.py(c)*', '/testing', path_to_file)
-else:
-    REPO_HOME_PATH = re.sub(r'/code/stat159lambda/config.py(c)*', '', path_to_file)
+# if os.environ.get('TEST') and os.environ['TEST'] == 1:
+    # REPO_HOME_PATH = re.sub(r'/code/stat159lambda/config.py(c)*', '/testing', path_to_file)
+# else:
+REPO_HOME_PATH = re.sub(r'/code/stat159lambda/config.py(c)*', '', path_to_file)
 
 USE_CACHED_DATA = os.environ.get('STAT159_CACHED_DATA', 'True') == 'True'
 
