@@ -1,8 +1,6 @@
 import json
 from stat159lambda.config import REPO_HOME_PATH
 
-DATA_PATHS = json.load(open('{0}/data/data_path.json'.format(REPO_HOME_PATH)))
-
 
 def get_raw_path(subj_num, run_num):
     """
