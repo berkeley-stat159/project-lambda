@@ -34,3 +34,7 @@ def get_correlation_path(subj_1_num, subj_2_num):
 def get_2d_path(subj_num):
     return '{0}/data/processed/sub{1}_rcds_2d.npy'.format(REPO_HOME_PATH,
                                                            subj_num)
+
+
+def get_brain_mask_path():
+    return '{0}/data/brain_mask.npy'.format(REPO_HOME_PATH)
