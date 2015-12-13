@@ -15,12 +15,36 @@ PERCENTILES = [0, 25, 50, 75, 90, 95, 99, 99.5, 100]
 
 
 def get_pairwise_correlations():
+    """
+    Finds and returns the paths to the correlations of all possible pairs of
+    subjects (if the paths exist)
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    paths : string array
+    """
     subject_pairs = itertools.combinations(SUBJECTS, 2)
     return [np.load(dp.get_correlation_path(subj_a, subj_b))
             for subj_a, subj_b in subject_pairs]
 
 
 def get_correlations(aggregation='pooled', nan=True):
+    """
+    Gets aggregated correlations either by averaging voxels or the pooling them
+    together, depending on specification
+
+    Parameters
+    ----------
+    aggregation : string (optional)
+
+    Returns
+    -------
+    correlations : array
+    """
     correlations = np.concatenate(tuple(get_pairwise_correlations()))
     if aggregation == 'mean':
         correlations = get_pairwise_correlations()
@@ -28,12 +52,22 @@ def get_correlations(aggregation='pooled', nan=True):
         if nan:
             correlations = correlations[~np.isnan(correlations)]
         return np.squeeze(np.asarray(correlations))
-    if aggregation == 'pooled':
-        correlations = np.concatenate(tuple(get_pairwise_correlations()))
-        return correlations[~np.isnan(correlations)]
+    return correlations[~np.isnan(correlations)]
 
 
 def save_correlation_histogram(aggregation):
+    """
+    Plots and saves the histogram of all correlations calculated by the
+    specified aggregation into figures folder
+
+    Parameters
+    ----------
+    aggregation : string
+
+    Returns
+    -------
+    None
+    """
     plt.hist(get_correlations(aggregation), bins=40)
     output_file_name = '{0}/figures/{1}_correlation_histogram.png'.format(
         REPO_HOME_PATH, aggregation)
@@ -42,6 +76,18 @@ def save_correlation_histogram(aggregation):
 
 
 def save_correlation_percentiles(aggregation):
+    """
+    Calculates and saves the correlation percentiles calculated by the
+    specified aggregation into figures folder
+
+    Parameters
+    ----------
+    aggregation : string
+
+    Returns
+    -------
+    None
+    """
     correlations = get_correlations(aggregation)
     results = [[p, np.percentile(correlations, p)] for p in PERCENTILES]
     output_file_name = '{0}/figures/{1}_correlation_percentiles.txt'.format(
