@@ -9,6 +9,8 @@ from stat159lambda.config import REPO_HOME_PATH, NUM_VOXELS, VOXEL_DIMENSIONS
 from stat159lambda.config import SUBJECTS
 from stat159lambda.utils import data_path as dp
 from stat159lambda.reproduction import brain_mask as bm
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 PERCENTILES = [0, 25, 50, 75, 90, 95, 99, 99.5, 100]
