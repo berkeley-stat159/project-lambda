@@ -15,7 +15,6 @@ INTEGER_LABELS = {'day-night': {'DAY': 0,
                               'EXT': 1}}
 
 TUNING_SECONDS_OFFSET = 17
-RESPONSE_DELAY = 4
 
 class SceneSlicer:
     """
