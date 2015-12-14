@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function
 from stat159lambda.utils import scene_slicer
-from stat159lambda.config import NUM_VOLUMES
+from stat159lambda.config import NUM_VOLUMES, NUM_OFFSET_VOLUMES
 import os
 import nibabel as nib
 import csv
@@ -50,6 +50,7 @@ def test_get_scene_slices():
     assert len(scene_slices[1]) == NUM_VOLUMES
     teardown_test()
 
+
 def test_get_labels_by_slice():
     ss = setup_test()
     assert (None, None) == ss.get_labels_by_slice(0)
@@ -59,3 +60,7 @@ def test_get_labels_by_slice():
     teardown_test()
 
 
+def test_get_clean_slice_mask():
+    ss = setup_test()
+    mask = ss.get_clean_slice_mask()
+    assert len(mask) == NUM_VOLUMES - NUM_OFFSET_VOLUMES
