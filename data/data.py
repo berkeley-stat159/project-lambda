@@ -4,10 +4,6 @@ import hashlib
 import json
 
 
-def get_hash_values(data_paths):
-    paths = data_paths["subjects"][0]['runs']
-    return [(p['linear']['path'].replace('{0}/data/'.format(REPO_HOME_PATH), ''), p['linear']['hash']) for p in paths]
-
 
 def generate_file_md5(filename, blocksize=2**20):
     m = hashlib.md5()
@@ -19,29 +15,29 @@ def generate_file_md5(filename, blocksize=2**20):
                     break
                 m.update(buf)
     except OSError:
-        print("Did you make data yet?")
+        print("Raw data file missing. Did you 'make data' yet?")
         return
     except IOError:
-        print("Did you make data yet?")
+        print("Raw data file missing. Did you 'make data' yet?")
         return
     return m.hexdigest()
 
 
-def check_hashes(d):
+def check_hashes(checksums):
     all_good = True
-    for k, v in d:
-        digest = generate_file_md5(k)
-        if v == digest:
-            print('The file {0} has the correct hash.'.format(k))
+    for filename in checksums.keys():
+        hash_value = checksums[filename]
+        digest = generate_file_md5(filename)
+        if hash_value == digest:
+            print('The file {0} has the correct hash.'.format(filename))
         else:
-            print('ERROR: The file {0} has the WRONG hash!'.format(k))
+            print('ERROR: The file {0} has the WRONG hash!'.format(filename))
             all_good = False
     return all_good
 
 
 if __name__ == '__main__':
-    data_json_path = '{0}/data/data_path.json'.format(REPO_HOME_PATH)
-    with open(data_json_path, 'r') as fh:
-        DATA_PATHS = json.load(fh)
-    data_path = '{0}/data/'.format(REPO_HOME_PATH)
-    check_hashes(get_hash_values(DATA_PATHS))
+    checksums_path = '{0}/data/raw_data_checksums.json'.format(REPO_HOME_PATH)
+    with open(checksums_path, 'r') as fh:
+        checksums = json.load(fh)
+    check_hashes(checksums)

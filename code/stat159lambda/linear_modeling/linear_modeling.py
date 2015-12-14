@@ -27,13 +27,13 @@ class VoxelExtractor:
         self.subject = subject
         self.interest_col_str = interest_col_str
         if not data:
-            data_path = dp.get_smoothed_path_2d(self.subject, 4)
-            data = nib.load(data_path).get_data()
-            data = data[:, :, :, NUM_OFFSET_VOLUMES:]
-        # Data is shaped as number of voxels by time
-        self.data = np.reshape(data, (-1, data.shape[-1]))
+            data_path = dp.get_smoothed_2d_path(self.subject, 4)
+            data = np.load(data_path)
+            data = data[:, NUM_OFFSET_VOLUMES:]
+        self.data = data
         self.design = None
         self.B = None
+        self.t_values = None
 
     def get_design_matrix(self):
         """
@@ -102,20 +102,21 @@ class VoxelExtractor:
         """
         if self.design is None:
             self.get_design_matrix()
-        y = np.asarray(self.data.T)
-        X = np.asarray(self.design)
-        c = [0, 0, 1]
-        c = np.atleast_2d(c).T
-        beta = npl.pinv(X).dot(y)
-        fitted = X.dot(beta)
-        errors = y - fitted
-        RSS = (errors**2).sum(axis=0)
-        df = X.shape[0] - npl.matrix_rank(X)
-        MRSS = RSS / df
-        SE = np.sqrt(MRSS * c.T.dot(npl.pinv(X.T.dot(X)).dot(c)))
-        SE[SE == 0] = np.amin(SE[SE != 0])
-        t = c.T.dot(beta) / SE
-        self.t_values = abs(t[0])
+        if self.t_values is None:
+            y = self.data.T
+            X = self.design
+            c = [0, 0, 1]
+            c = np.atleast_2d(c).T
+            beta = npl.pinv(X).dot(y)
+            fitted = X.dot(beta)
+            errors = y - fitted
+            RSS = (errors**2).sum(axis=0)
+            df = X.shape[0] - npl.matrix_rank(X)
+            MRSS = RSS / df
+            SE = np.sqrt(MRSS * c.T.dot(npl.pinv(X.T.dot(X)).dot(c)))
+            SE[SE == 0] = np.amin(SE[SE != 0])
+            t = c.T.dot(beta) / SE
+            self.t_values = abs(t[0])
         self.t_indices = np.array(self.t_values).argsort(
         )[::-1][:self.t_values.size]
         return self.t_indices

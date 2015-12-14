@@ -8,13 +8,13 @@ from stat159lambda.config import REPO_HOME_PATH
 from stat159lambda.config import NUM_OFFSET_VOLUMES, NUM_VOLUMES
 
 INTEGER_LABELS = {'day-night': {'DAY': 0,
-                                'NIGHT': 1,
-                                'DAWN': 2},
+                                'DAWN': 0,
+                                'NIGHT': 1
+                                },
                   'int-ext': {'INT': 0,
                               'EXT': 1}}
 
 TUNING_SECONDS_OFFSET = 17
-
 
 class SceneSlicer:
     """
@@ -128,3 +128,24 @@ class SceneSlicer:
         day_label = self.scene_slices[0][slice]
         int_label = self.scene_slices[1][slice]
         return (day_label, int_label)
+
+    def get_clean_slice_mask(self):
+        scene_labels = self.get_scene_slices()[0]
+        scene_change_times = self.scene_desc.keys()
+        scene_change_indices = []
+        for i in scene_change_times:
+            if self.get_labels_by_slice((i+1)//2)[1] != self.get_labels_by_slice((i-1)//2)[1]:
+                scene_change_indices.append((i+1)//2)
+                scene_change_indices.append((i+1)//2 + 1)
+        scene_change_indices = np.array(scene_change_indices)
+        scene_change_indices -= NUM_OFFSET_VOLUMES
+        mask = np.ones(len(scene_labels) - NUM_OFFSET_VOLUMES)
+        for i in range(len(mask)):
+            if i in scene_change_indices:
+                mask[i] = 0
+        return mask.astype(bool)
+
+
+
+
+
