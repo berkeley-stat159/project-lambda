@@ -1,5 +1,4 @@
-from __future__ import print_function
-from __future__ import division
+from __future__ import print_function, division
 import numpy as np
 import sys
 import matplotlib
@@ -47,12 +46,14 @@ def save_plot(vol_rms_diff, subj_num):
     None
     """
     plt.plot(vol_rms_diff)
-    plt.savefig('{0}/figures/subj{1}_vol_rms_diff.png'.format(
-        REPO_HOME_PATH, subj_num))
+    plot_path = '{0}/figures/subj{1}_vol_rms_diff.png'.format(REPO_HOME_PATH,
+                                                              subj_num)
+    plt.savefig(plot_path)
+    print('Saved {0}'.format(plot_path))
 
 
 if __name__ == '__main__':
     subj_num, fwhm_mm = 1, 8
-    vol_rms_diff = calc_vol_rms_diff(dp.get_smoothed_2d_path(subj_num, fwhm_mm))
+    vol_rms_diff = calc_vol_rms_diff(dp.get_smoothed_2d_path(subj_num,
+                                                             fwhm_mm))
     save_plot(vol_rms_diff, subj_num)
-    del vol_rms_diff
