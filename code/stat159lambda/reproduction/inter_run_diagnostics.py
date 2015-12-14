@@ -1,10 +1,12 @@
-from __future__ import print_function
-from __future__ import division
+from __future__ import print_function, division
 import numpy as np
 import sys
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import gc
-from stat159lambda.config import REPO_HOME_PATH
+from stat159lambda.config import REPO_HOME_PATH, NUM_OFFSET_VOLUMES
+from stat159lambda.utils import data_path as dp
 
 
 def calc_vol_rms_diff(data_file_path):
@@ -26,7 +28,7 @@ def calc_vol_rms_diff(data_file_path):
     del data
     gc.collect()
     vol_rms_diff = np.sqrt(np.mean(diff_data**2, axis=0))
-    return vol_rms_diff[9:]
+    return vol_rms_diff[NUM_OFFSET_VOLUMES:]
 
 
 def save_plot(vol_rms_diff, subj_num):
@@ -44,14 +46,14 @@ def save_plot(vol_rms_diff, subj_num):
     None
     """
     plt.plot(vol_rms_diff)
-    plt.savefig('{0}/figures/subj{1}_vol_rms_diff.png'.format(
-        REPO_HOME_PATH, subj_num))
+    plot_path = '{0}/figures/subj{1}_vol_rms_diff.png'.format(REPO_HOME_PATH,
+                                                              subj_num)
+    plt.savefig(plot_path)
+    print('Saved {0}'.format(plot_path))
 
 
 if __name__ == '__main__':
-    subj_num = sys.argv[1]
-    data_file_path = '{0}/data/processed/sub{1}_rcds_2d.npy'.format(
-        REPO_HOME_PATH, subj_num)
-    vol_rms_diff = calc_vol_rms_diff(data_file_path)
+    subj_num, fwhm_mm = 1, 8
+    vol_rms_diff = calc_vol_rms_diff(dp.get_smoothed_2d_path(subj_num,
+                                                             fwhm_mm))
     save_plot(vol_rms_diff, subj_num)
-    del vol_rms_diff
