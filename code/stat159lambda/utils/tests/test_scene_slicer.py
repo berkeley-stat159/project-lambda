@@ -25,7 +25,7 @@ def teardown_test():
 def test_constants():
     assert scene_slicer.INTEGER_LABELS == {'day-night': {'DAY': 0,
                                                          'NIGHT': 1,
-                                                         'DAWN': 2},
+                                                         'DAWN': 0},
                                            'int-ext': {'INT': 0,
                                                        'EXT': 1}}
     assert scene_slicer.TUNING_SECONDS_OFFSET == 17
@@ -42,7 +42,7 @@ def test_scene_slicer_init():
 def test_get_scene_slices():
     ss = setup_test()
     scene_slices = ss.get_scene_slices()
-    day_night_labels = 9*[None] + 11*[0] + 11*[1] + 15*[0] + 4*[1] 
+    day_night_labels = 9*[None] + 11*[0] + 11*[1] + 15*[0] + 4*[1]
     int_ext_labels = 9*[None] + 11*[1] + 11*[0] + 15*[1] + 4*[0]
     assert scene_slices[0][:50] == day_night_labels
     assert scene_slices[1][:50] == int_ext_labels
