@@ -47,7 +47,7 @@ class ConcatenateRunsTestCase(unittest.TestCase):
     def test_get_affine(self, mock_raw, mock_np_save, mock_np_load):
         mock_raw.return_value = '{0}/testing/test_raw.nii'.format(REPO_HOME_PATH)
         preprocess.get_affine()
-        assert mock_np_load.call_args[0][0] == '{0}/data/affine.npy'.format(REPO_HOME_PATH)
+        assert mock_np_save.call_args[0][0] == '{0}/data/affine.npy'.format(REPO_HOME_PATH)
 
     @patch.object(preprocess, 'apply_gaussian_smooth')
     @patch.object(np, 'load')
