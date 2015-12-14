@@ -15,8 +15,21 @@ Since large matrices must be computed and held in memory, systems should have at
 3. Code depends on an internally provided python module module called `stat159lambda`. Ensure this module is on your python path with `export PYTHONPATH='<absolute-path-to-repository>/project-lambda/code'`.  
 For example, `export PYTHONPATH='/Users/alondaks/project-lambda/code'`. We strongly encourage adding your export statement to your `.bashrc` while running this project to ensure the environement variable is defined in all shells. 
 
-## Environment Variables
-Data for a single subject is ~7.5 GBs due to 2 hour scan at 7 Tesla resolution. The preprocessing scripts are therefore memory intensive. Reproducing preprocessing code should be on a machine with 70+ GBs. In addition to downloading raw data, ``make data`` from the root project directory will download all preprocessed data. Setting a unix environment variable ``USE_CACHED_DATA`` will instruct scripts if they reexecute preprocessing or not. ``USE_CACHED_DATA='True'`` will bypass any presprocessing as long as the resulting preprocessed file exists in ``data/processed/``. ``USE_CACHED_DATA='False'`` will recalculate preprocessed files even if they exist in ``data/processed/``. ``USE_CACHED_DATA`` will default ``'True'``.
+## How to run code and analysis
+Please run the follow make commands in order from top to bottom.  
+
+1. Download and verify data    
+  - `make data` fetches and downloads raw data  
+  - `make validate-data` verifies data integrity against known checksums  
+2. Preprocess the data 
+  - `make preprocess` concatenates runs, applies guassian filter, and reshapes data to 2d 
+3. Exploratory data analysis 
+  - `make eda` produces eda plots and simulations 
+4. Reproduction 
+  - `make reproduction` runs all correlation reproduction work and produces analysis figures 
+5. Classification 
+  - `make classification-cross-validate` runs random forrest cross validation and saves cv accuracies to file 
+  - `make classification-validation` tests a fully trained random forrest on validation set and saves accuracy to file 
 
 
 
@@ -25,3 +38,5 @@ Data for a single subject is ~7.5 GBs due to 2 hour scan at 7 Tesla resolution. 
 - Jordeen Chang ([`jodreen`](https://github.com/jodreen))
 - Lisa Ann Yu ([`lisaannyu`](https://github.com/lisaannyu))
 - Ying Luo ([`yingtluo`](https://github.com/yingtluo))
+
+*Special thank you to Jarrod Millman, Matthew Brett, Ross Barnowski, and J-B Poline for their continued support, instruction and encouragment with this project*
