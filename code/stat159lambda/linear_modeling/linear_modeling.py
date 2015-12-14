@@ -10,7 +10,6 @@ from stat159lambda.config import REPO_HOME_PATH, NUM_OFFSET_VOLUMES
 
 
 class VoxelExtractor:
-
     def __init__(self, subject, interest_col_str, data=None):
         """
         VoxelExtractor generates the t-statistic for each voxel based on a
@@ -51,7 +50,8 @@ class VoxelExtractor:
             elif self.interest_col_str == "day-night":
                 interest_col_ind = 0
             else:
-                print("Incorrect interest column name: please use either 'int-ext' or 'day-night'")
+                print(
+                    "Incorrect interest column name: please use either 'int-ext' or 'day-night'")
             interest_col = ss.get_scene_slices()[interest_col_ind]
             n_trs = self.data.shape[-1]
             design = np.ones((n_trs, 3))
@@ -70,9 +70,13 @@ class VoxelExtractor:
         if self.design is None:
             self.get_design_matrix()
         design_fig = plt.gcf()
-        plt.imshow(self.design, aspect=0.1, cmap='gray', interpolation='nearest')
+        plt.imshow(self.design,
+                   aspect=0.1,
+                   cmap='gray',
+                   interpolation='nearest')
         plt.xticks([])
-        design_fig_path = '{0}/figures/design_fig_{1}.png'.format(REPO_HOME_PATH, self.interest_col_str)
+        design_fig_path = '{0}/figures/design_fig_{1}.png'.format(
+            REPO_HOME_PATH, self.interest_col_str)
         design_fig.savefig(design_fig_path, dpi=100)
         plt.clf()
 
@@ -112,7 +116,8 @@ class VoxelExtractor:
         SE[SE == 0] = np.amin(SE[SE != 0])
         t = c.T.dot(beta) / SE
         self.t_values = abs(t[0])
-        self.t_indices = np.array(self.t_values).argsort()[::-1][:self.t_values.size]
+        self.t_indices = np.array(self.t_values).argsort(
+        )[::-1][:self.t_values.size]
         return self.t_indices
 
     def plot_single_voxel(self, voxel_index):
@@ -125,6 +130,7 @@ class VoxelExtractor:
         """
         voxel_img = plt.gcf()
         plt.plot(self.data[voxel_index, :])
-        voxel_img_path = '{0}/figures/voxel_{1}.png'.format(REPO_HOME_PATH, voxel_index)
+        voxel_img_path = '{0}/figures/voxel_{1}.png'.format(REPO_HOME_PATH,
+                                                            voxel_index)
         voxel_img.savefig(voxel_img_path, dpi=100)
         plt.clf()
