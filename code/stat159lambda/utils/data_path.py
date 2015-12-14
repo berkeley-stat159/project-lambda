@@ -15,9 +15,7 @@ def get_raw_path(subj_num, run_num):
     -------
     path : string
     """
-    if subj_num < 10:
-        subj_num = '0' + str(subj_num)
-    return '{0}/data/raw/sub0{1}/task001_run00{2}/bold_dico_dico_rcds_nl.nii'.format(
+    return '{0}/data/raw/sub{1}_run{2}_raw.nii'.format(
         REPO_HOME_PATH, subj_num, run_num)
 
 
@@ -107,6 +105,11 @@ def get_2d_path(subj_num):
     return '{0}/data/processed/sub{1}_rcds_2d.npy'.format(REPO_HOME_PATH,
                                                            subj_num)
 
+
+def get_brain_mask_path():
+    return '{0}/data/brain_mask.npy'.format(REPO_HOME_PATH)
+
+
 def get_correlation_hist_path(aggregation):
     """
     Derives the absolute path to the correlations calculated by using either
@@ -122,11 +125,6 @@ def get_correlation_hist_path(aggregation):
     """
     return '{0}/figures/{1}_correlation_histogram.png'.format(REPO_HOME_PATH,
                                                                 aggregation)
-
-
-def get_smoothed_path_2d(subj_num, fwhm_mm):
-    return '{0}/data/processed/sub{1}_rcds_smoothed_{2}_mm_2d.npy'.format(
-        REPO_HOME_PATH, subj_num, fwhm_mm)
 
 
 def get_scene_csv():

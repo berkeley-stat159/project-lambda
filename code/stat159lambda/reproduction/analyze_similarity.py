@@ -5,8 +5,10 @@ import itertools
 import sys
 from os.path import exists
 import gc
-from stat159lambda.config import REPO_HOME_PATH, NUM_VOXELS, SUBJECTS
+from stat159lambda.config import REPO_HOME_PATH, NUM_VOXELS, VOXEL_DIMENSIONS
+from stat159lambda.config import SUBJECTS
 from stat159lambda.utils import data_path as dp
+from stat159lambda.reproduction import brain_mask as bm
 import matplotlib.pyplot as plt
 
 PERCENTILES = [0, 25, 50, 75, 90, 95, 99, 99.5, 100]
@@ -30,10 +32,10 @@ def get_pairwise_correlations():
             for subj_a, subj_b in subject_pairs]
 
 
-def get_correlations(aggregation='pooled'):
+def get_correlations(aggregation='pooled', nan=True):
     """
-    Calculates correlations either using means or the pooled data, depending
-    on specification
+    Gets aggregated correlations either by averaging voxels or the pooling them
+    together, depending on specification
 
     Parameters
     ----------
@@ -47,7 +49,8 @@ def get_correlations(aggregation='pooled'):
     if aggregation == 'mean':
         correlations = get_pairwise_correlations()
         correlations = np.mean(np.matrix(correlations).T, axis=1)
-        correlations = correlations[~np.isnan(correlations)]
+        if nan:
+            correlations = correlations[~np.isnan(correlations)]
         return np.squeeze(np.asarray(correlations))
     return correlations[~np.isnan(correlations)]
 
@@ -70,7 +73,6 @@ def save_correlation_histogram(aggregation):
         REPO_HOME_PATH, aggregation)
     plt.savefig(output_file_name)
     print('Saved {0}'.format(output_file_name))
-    plt.clf()
 
 
 def save_correlation_percentiles(aggregation):
@@ -94,12 +96,32 @@ def save_correlation_percentiles(aggregation):
     print('Saved {0}'.format(output_file_name))
 
 
+def correlation_brain_image():
+    correlations_3d = np.reshape(
+        get_correlations('mean',
+                         nan=False),
+        VOXEL_DIMENSIONS)
+    image = correlations_3d[:, :, 24]
+    image += image.min()
+    outside_brain_mask = np.logical_not(bm.get_brain_mask())[:, :, 24]
+    image[outside_brain_mask] = 0
+    hot_mask = image >= np.percentile(get_correlations('mean', nan=True), 95)
+    hot_pixels = np.zeros_like(image, dtype=np.float)
+    hot_pixels[hot_mask] = image[hot_mask]
+    hot_pixels[~hot_mask] = np.nan
+    plt.imshow(image, interpolation='nearest', cmap='gray')
+    plt.imshow(hot_pixels, interpolation='nearest', cmap='Blues')
+    plot_path = '{0}/figures/correlated_brain.png'.format(REPO_HOME_PATH)
+    plt.savefig(plot_path)
+    print('Saved {0}'.format(plot_path))
+
+
 def main():
     save_correlation_histogram('mean')
     save_correlation_histogram('pooled')
     save_correlation_percentiles('mean')
     save_correlation_percentiles('pooled')
-
+    correlation_brain_image()
 
 if __name__ == '__main__':
     main()

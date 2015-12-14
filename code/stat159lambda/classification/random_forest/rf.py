@@ -9,7 +9,7 @@ class Classifier:
                  y,
                  max_features='auto',
                  depth=None,
-                 n_estimators=400):
+                 n_estimators=300):
         self.model = RandomForestClassifier(max_features=max_features,
                                             n_estimators=n_estimators,
                                             max_depth=None,
