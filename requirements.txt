@@ -4,4 +4,3 @@ scipy==0.16.0
 matplotlib==1.4.3
 nibabel==2.0.1
 scikit_learn==0.15.2
-sharedmem==0.3.1

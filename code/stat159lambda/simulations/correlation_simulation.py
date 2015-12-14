@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 from scipy import stats
 import matplotlib
@@ -20,10 +21,13 @@ def simulate_inter_run_correlation():
     ax1.plot(subj_2, c='r', label='Subject b')
     ax1.axvline(100, color='g', linestyle='solid')
     plt.legend(loc='upper left')
-    plt.savefig('{0}/figures/sim_inter_run.png'.format(REPO_HOME_PATH))
-    np.savetxt(
-        '{0}/figures/sim_inter_run_correlations.txt'.format(REPO_HOME_PATH),
-        correlations)
+    plot_path = '{0}/figures/sim_inter_run.png'.format(REPO_HOME_PATH)
+    plt.savefig(plot_path)
+    print('Saved {0}'.format(plot_path))
+    text_path = '{0}/figures/sim_inter_run_correlations.txt'.format(
+        REPO_HOME_PATH)
+    np.savetxt(text_path, correlations)
+    print('Saved {0}'.format(text_path))
 
 
 if __name__ == '__main__':

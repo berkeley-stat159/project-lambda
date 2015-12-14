@@ -27,15 +27,8 @@ def get_brain_mask():
     return np.load(brain_mask_path)
 
 
-def plot_brain_mask(axis, m):
-    in_brain_mask = get_brain_mask()
-    image = None
-    if axis == 0:
-        image = in_brain_mask[m, :, :]
-    if axis == 1:
-        image = in_brain_mask[:, m, :]
-    if axis == 2:
-        image = in_brain_mask[:, :, m]
+def plot_brain_mask(slice):
+    image = get_brain_mask()[:, :, slice]
     plt.imshow(image, cmap='gray')
     plot_path = '{0}/figures/brain_mask.png'.format(REPO_HOME_PATH)
     plt.savefig(plot_path)
@@ -44,7 +37,6 @@ def plot_brain_mask(axis, m):
 
 if __name__ == '__main__':
     subject_num = 1
-    brain_axis = 2
-    brain_slice = 24	
+    brain_slice = 24
     plot_vol_mean_histogram(subject_num)
-    plot_brain_mask(brain_axis, brain_slice)
+    plot_brain_mask(brain_slice)
