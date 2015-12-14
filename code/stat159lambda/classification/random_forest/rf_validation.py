@@ -31,7 +31,7 @@ def main():
     print('Validation set accuracy: {0}'.format(accuracy))
     output_path = '{0}/figures/validation_accuracy.txt'.format(
         REPO_HOME_PATH)
-    np.savetxt(output_path, accuracy)
+    np.savetxt(output_path, np.array([accuracy]))
     print('Saved {0}'.format(output_path))
 
 
