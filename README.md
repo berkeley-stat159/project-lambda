@@ -2,6 +2,11 @@
 [![Build Status](https://travis-ci.org/berkeley-stat159/project-lambda.svg?branch=master)](https://travis-ci.org/berkeley-stat159/project-lambda?branch=master)
 [![Coverage Status](https://coveralls.io/repos/berkeley-stat159/project-lambda/badge.svg?branch=master)](https://coveralls.io/r/berkeley-stat159/project-lambda?branch=master)
 
+## Overview
+This project reproduces a subset of the analysis conducted in *A High-Resolution 7-Tesla fMRI Dataset from Complex Natural Stimulation with an Audio Movie*by Hanke et al. We analyze inter-subject correlation among 5 subjects, then apply machine learning to see if we can predict if a subject was
+listening to an interior or exterior scene of the movie based on brain state. The results for our reproduction are consistent with those produced by Hanke et al. and our internal-external scene classifier has a validation accuracy of 0.942.
+
+
 ## System requirements
 ### Storage
 The raw data is approximately 37.5 GBs. Additionally, the complete analysis will - in total - produce another approximately 190 GBs of data written to disk. Please ensure your machine is equippted with sufficient storage space. 
