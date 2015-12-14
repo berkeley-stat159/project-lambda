@@ -97,14 +97,14 @@ def main():
     for subj_num in SUBJECTS:
         concatenate_runs(subj_num)
         gc.collect()
-        gaussian_smooth_subj(subj_num, INTRA_SUBJECT_SMOOTH_MM)
-        gc.collect()
         gaussian_smooth_subj(subj_num, INTER_SUBJECT_SMOOTH_MM)
-        gc.collect()
-        reshape_smoothed_to_2d(subj_num, INTRA_SUBJECT_SMOOTH_MM)
         gc.collect()
         reshape_smoothed_to_2d(subj_num, INTER_SUBJECT_SMOOTH_MM)
         gc.collect()
+    gaussian_smooth_subj(1, INTRA_SUBJECT_SMOOTH_MM)
+    gc.collect()
+    reshape_smoothed_to_2d(1, INTRA_SUBJECT_SMOOTH_MM)
+    gc.collect()
 
 
 if __name__ == '__main__':
