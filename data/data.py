@@ -40,4 +40,8 @@ if __name__ == '__main__':
     checksums_path = '{0}/data/raw_data_checksums.json'.format(REPO_HOME_PATH)
     with open(checksums_path, 'r') as fh:
         checksums = json.load(fh)
-    check_hashes(checksums)
+    allgood = check_hashes(checksums)
+    if allgood:
+        print('DATA DOWNLOAD SUCCEEDED: All files look good')
+    else:
+        print('DATA DOWNLOAD ERROR: At least one file is corrupt')
