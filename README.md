@@ -16,7 +16,7 @@ Since large matrices must be computed and held in memory, systems should have at
 For example, `export PYTHONPATH='/Users/alondaks/project-lambda/code'`. We strongly encourage adding your export statement to your `.bashrc` while running this project to ensure the environement variable is defined in all shells. 
 
 ## How to run code and analysis
-Please run the follow make commands in order from top to bottom.  
+Please run the follow make commands in order from top to bottom from within the top level project directory.  
 
 1. Download and verify data    
   - `make data` fetches and downloads raw data  
