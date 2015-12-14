@@ -10,15 +10,9 @@ AGGREGATION = 'pooled'
 
 def test_get_raw_path():
 	paths = [dp.get_raw_path(subject, RUN_NUM) for subject in SUBJECTS]
-	assert paths[0] == '{0}/data/raw/sub001/task001_run001/bold_dico_dico_rcds_nl.nii'.format(
+	assert paths[0] == '{0}/data/raw/sub1_run1_raw.nii'.format(
 		REPO_HOME_PATH)
-	assert paths[1] == '{0}/data/raw/sub002/task001_run001/bold_dico_dico_rcds_nl.nii'.format(
-		REPO_HOME_PATH)
-	assert paths[2] == '{0}/data/raw/sub003/task001_run001/bold_dico_dico_rcds_nl.nii'.format(
-		REPO_HOME_PATH)
-	assert paths[3] == '{0}/data/raw/sub004/task001_run001/bold_dico_dico_rcds_nl.nii'.format(
-		REPO_HOME_PATH)
-	assert paths[4] == '{0}/data/raw/sub005/task001_run001/bold_dico_dico_rcds_nl.nii'.format(
+	assert paths[1] == '{0}/data/raw/sub2_run1_raw.nii'.format(
 		REPO_HOME_PATH)
 
 

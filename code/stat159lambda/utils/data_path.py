@@ -15,9 +15,7 @@ def get_raw_path(subj_num, run_num):
     -------
     path : string
     """
-    if subj_num < 10:
-        subj_num = '0' + str(subj_num)
-    return '{0}/data/raw/sub0{1}/task001_run00{2}/bold_dico_dico_rcds_nl.nii'.format(
+    return '{0}/data/raw/sub{1}_run{2}_raw.nii'.format(
         REPO_HOME_PATH, subj_num, run_num)
 
 
