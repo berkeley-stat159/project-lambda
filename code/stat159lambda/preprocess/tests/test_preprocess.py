@@ -47,7 +47,6 @@ class ConcatenateRunsTestCase(unittest.TestCase):
     def test_get_affine(self, mock_raw, mock_np_save, mock_np_load):
         mock_raw.return_value = '{0}/testing/test_raw.nii'.format(REPO_HOME_PATH)
         preprocess.get_affine()
-        print mock_np_save.call_args
         assert mock_np_load.call_args[0][0] == '{0}/data/affine.npy'.format(REPO_HOME_PATH)
 
     @patch.object(preprocess, 'apply_gaussian_smooth')
@@ -69,7 +68,6 @@ class ConcatenateRunsTestCase(unittest.TestCase):
     def test_get_voxel_lengths(self):
         affine = np.array([[1, 2, 4, 5], [1, 2, 3, 4], [2, 3, 5, 6]])
         voxel_len = preprocess.get_voxel_lengths(affine)
-        print(voxel_len)
         assert voxel_len.size == 3
         assert_array_almost_equal(voxel_len, [2.44948974, 4.12310563, 7.07106781])
 
