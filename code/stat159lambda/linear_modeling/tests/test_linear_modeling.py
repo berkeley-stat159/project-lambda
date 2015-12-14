@@ -10,54 +10,64 @@ from __future__ import absolute_import, division, print_function
 import numpy as np
 import matplotlib.pyplot as plt
 import numpy.linalg as npl
+import unittest
 from stat159lambda.linear_modeling import linear_modeling as lm
-from numpy.testing import assert_equal, assert_almost_equal
+from numpy.testing import assert_equal, assert_almost_equal, assert_array_equal
+from stat159lambda.config import REPO_HOME_PATH, NUM_OFFSET_VOLUMES
+
+try:
+    from mock import patch
+except:
+    from unittest.mock import patch
 
 
-# def setup_test():
-#     data = np.array([[1, 0, 7, 8, 0], [1, 0, 4, 10, 4], [3, 7, 10, 1, 12
-#                                                          ], [3, 7, 10, 1, 12],
-#                      [3, 7, 10, 1, 12], [3, 0, 7, 4, 12], [3, 0, 7, 4, 12]])
-#     ve = lm.VoxelExtractor(0, 'day-night', data=data)
-#     return ve
+class LinearModeling(unittest.TestCase):
+    def setup_data(self):
+        data = np.array([[1, 2, 7, 8, 2], [1, 2, 4, 12, 4], [3, 7, 12, 1, 12
+                                                             ], [3, 7, 12, 1, 12],
+                         [3, 7, 12, 1, 12], [3, 2, 7, 4, 12], [3, 2, 7, 4, 12]])
+        return data
 
+    def setup_test(self):
+        ve = lm.VoxelExtractor(0, 'day-night', data=self.setup_data())
+        return ve
 
-# def test_get_betas_Y():
-#     ve = setup_test()
-#     actual = linear_modeling.get_betas_Y(X, data)[0]
-#     expected = np.array([[-0.85496183, -0.11450382, -0.01526718],
-#                          [6.91603053, 2.90839695, 6.58778626]])
-#     assert_almost_equal(expected, actual)
-#     actual = linear_modeling.get_betas_Y(X, data)[1]
-#     expected = np.array([[1, 1, 3], [0, 0, 7], [7, 4, 9], [0, 4, 7]])
-#     assert_almost_equal(expected, actual)
+    @patch.object(np, 'load')
+    def test_init_none_data(self, mock_np_load):
+        data = self.setup_data()
+        mock_np_load.return_value = data
+        ve = lm.VoxelExtractor(0, 'int-ext')
+        assert_array_equal(ve.data, data[:, NUM_OFFSET_VOLUMES:])
 
+    def test_incorrect_col_name(self):
+        self.assertRaises(ValueError, lm.VoxelExtractor, 0, 'night-day', data=self.setup_data())
 
-# def test_get_betas_4d():
-#     actual = linear_modeling.get_betas_4d(
-#         linear_modeling.get_betas_Y(X, data)[0], data)
-#     expected = np.array([[[-0.85496183, 6.91603053], [-0.11450382, 2.90839695],
-#                           [-0.01526718, 6.58778626]]])
-#     assert_almost_equal(expected, actual)
+    def test_get_design_matrix(self):
+        ve = self.setup_test()
+        ve.get_design_matrix()
+        assert ve.design.shape[0] == ve.data.shape[1]
+        assert ve.design.shape[1] == 3
 
+    @patch.object(plt, 'imshow')
+    def test_plot_design_matrix(self, mock_imshow):
+        ve = self.setup_test()
+        ve.plot_design_matrix()
+        assert_array_equal(mock_imshow.call_args[0][0], ve.design)
 
-# def test_t_stat():
-#     actual = linear_modeling.t_stat(
-#         linear_modeling.get_betas_Y(X, data)[1], X, [0, 1])
-#     expected = np.array([2.7475368, 1.04410995, 1.90484058])
-#     assert_almost_equal(expected, actual)
+    def test_get_betas_Y(self):
+        ve = self.setup_test()
+        ve.get_betas_Y()
+        assert ve.B is not None
 
+    def test_t_stat(self):
+        ve = self.setup_test()
+        ve.t_stat()
+        assert ve.t_indices is not None
+        assert ve.t_values is not None
+        assert ve.t_indices.shape[0] == ve.data.shape[0]
 
-# def test_get_top_32():
-#     a = np.array([6, 4, 1, 2, 8, 8, 1, 9, 5, 2, 1, 9, 5, 4, 3, 6, 5, 3, 5, 8])
-#     assert_equal(linear_modeling.get_top_32(a, .2), [11, 7, 19, 4])
-#     actual = linear_modeling.get_top_32(
-#         linear_modeling.t_stat(
-#             linear_modeling.get_betas_Y(X, data)[1], X, [0, 1]), .5)
-#     expected = np.array([0, 2])
-#     assert_almost_equal(actual, expected)
-
-
-# def test_get_index_4d():
-#     actual = linear_modeling.get_index_4d([0, 2], data)
-#     assert_equal(list(actual), [(0, 0), (0, 2)])
+    @patch.object(plt, 'plot')
+    def test_plot_single_voxel(self, mock_plot):
+        ve = self.setup_test()
+        ve.plot_single_voxel(0)
+        assert_array_equal(mock_plot.call_args[0][0], np.array([1, 2, 7, 8, 2]))
