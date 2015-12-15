@@ -1,3 +1,5 @@
+# Script that runs validation for random forest
+
 from __future__ import print_function, division
 import numpy as np
 from sklearn.metrics import accuracy_score

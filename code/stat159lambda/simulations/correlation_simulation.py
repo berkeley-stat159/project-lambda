@@ -1,3 +1,5 @@
+# Script to demonstrate simulated runs affect
+
 from __future__ import division
 import numpy as np
 from scipy import stats
