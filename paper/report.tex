@@ -1,8 +1,8 @@
 \documentclass[11pt]{article}
-
 \usepackage[margin=0.75in]{geometry}
 \usepackage{hyperref}
 \usepackage{graphicx}
+\usepackage{float}
 \graphicspath{ {images/} }
 
 \title{fMRI Dataset from Complex Natural Simulation with \emph{Forrest Gump}: \\A Restudy}
@@ -26,36 +26,44 @@
 \maketitle
 
 \abstract{Most fMRI studies use highly simplified stimuli that are very
-different from what people experience in everyday life. "A High-Resolution 7-
-Tesla fMRI Dataset from Complex Natural Stimulation with an Audio Movie" by
+different from what people experience in everyday life. ``A High-Resolution 7-Tesla fMRI Dataset from Complex Natural Stimulation with an Audio Movie" by
 Hanke et al. sought to create a dataset of naturally occurring brain states
 by exposing participants to a more complex stimulus, the audio description of
-\emph{Forrest Gump}. This particular audio description allows for the study of
+\emph{Forrest Gump}. Scanning subjects who are listening to the two hour audio track of the movie allows for the study of
 auditory attention and cognition, language and music perception, and retrieval
 of explicit memory without the effect of visual imagery. Furthermore, the
 study was conducted on 20 subjects enabling research into brain similarities
 among individuals when exposed to the same complex stimulus. The goal of our
-paper is to first reproduce a subset of the analysis conducted by Hanke et
-al., then apply machine learning to see if we can predict if a subject was
-listening to a day or night scene of the movie based on brain state.}
+paper is to first reproduce a subset of the analysis conducted by Hanke et al. where we will analyze inter-subject correlation among 5 subjects, then apply machine learning to see if we can predict if a subject was
+listening to an interior or exterior scene of the movie based on brain state. The results for our reproduction are consistent with those produced by Hanke et al. and our internal-external scene classifier has a validation accuracy of 0.934.}
 
 \section{Introduction}
 
 The main purpose of the original study was to examine properties of brain
 response patterns that are supposedly common when people are exposed to audio
-and movie simulation. We intend to replicate their experiment using the data
+and movie stimulation, since that should be more representative of naturally 
+occurring brain states than highly simplified experiments with a simple on/off
+stimulus.  Additionally, the literature is almost entirely limited to visual 
+stimulation, which is why Hanke et al. chose to use an auditory version of 
+\emph{Forrest Gump} produced for a visually impaired audience. 
+
+We intend to replicate their experiment using the data
 they gathered from the 20 participants. For example, a BOLD time-series
 similarity measure (e.g. correlation) is often used to quantify similarities
 in responses among individuals. Hanke et al. recognized that this was a common
-approach, but they went beyond that and also implemented representational
+approach, but went beyond that by implementing a representational
 similarity analysis (RSA)\cite{hank2014audiomovie}. To replicate their 
-analysis, we will create dissimilarity matrices for 5 individuals using the 
-same searchlight mapping approach that they used. Doing so will capture 
-2nd-order isomorphisms in response patterns. 
+analysis, we will calculate inter-subject pairwise correlations among 5 individuals.
 Lastly, to access statistical significance, we will transform the 
 representational consistency map into percent rank with respect to the total 
 distribution of the DSM correlations. We'll calculate both the pooled and mean 
 correlation coefficients and compare our values to theirs.
+
+We intend to extend their experiment by adding a classification analysis that
+predicts which scenes take place inside and which take place outside.  We will
+select voxels with the largest difference in BOLD signal
+between interior and exterior scenes to be our features, then use random forest to 
+predict volumes as interior or exterior.
 
 Before we formally began, we performed basic sanity checks on the data. We
 downloaded and loaded the files successfully, and we have confirmed that we
@@ -64,7 +72,7 @@ have data for every test subject.
 Reproducibility is crucial in research, especially when such high volumes of
 data are involved, because it allows other people to fact-check the work. When
 people collaborate, new insights can be shed and the rate of progress is
-expedited. For this study, we began by extracting data we see fitting and
+expedited. For this study, we began by extracting data we saw fitting and
 asking questions that were not addressed by the original study. To answer
 these questions, we utilized neuroscience concepts, additional packages, and
 parallel processing techniques. We found that in certain functions, such as
@@ -75,26 +83,20 @@ modified.
 
 A central theme of the course is exploring reproducible practices while 
 conducting scientific research. For our project we address reproducibility from 
-two perspectives: first, we designed our code and scripts to be modular and 
-portable so that anyone with an appropriate computer can rerun our analysis 
-and reproduce the results we cite in this paper. Second, we attempted to 
+two perspectives: 1) We attempted to 
 reproduce some of the results cited in the original paper by emulating Hanke 
-et al.'s technique and comparing values. 
+et al.'s technique and comparing values. 2) We designed our code and scripts to be modular and 
+portable so that anyone with an appropriate computer can rerun our analysis 
+and reproduce the results we cite in this paper. 
 
 \section{Data}
 
-The data is curated and segmented into 20 .TGZ files, where each of the 20
-.TGZ  files corresponds to one of the 20 subjects in the experiment. Each
-subject  accounts for approximately 16 GBs of data. We verified the usability
-of the data by inspecting and loading data corresponding to subject 1. We
-limited our initial exploration to a single subject since downloading each
-.TGZ takes  approximately one hour.  The download for each subject includes a
-lot of other information besides just the fMRI data, such as cardiac and
+The data is curated and segmented by subject and run. Each subject includes fMRI data along with cardiac and
 respiratory trace, angiographies, and structural MRI data. Each subject's fMRI
-data includes several formats: Raw BOLD functional MRI, Raw BOLD functional
-MRI (with applied distortion correction), Raw BOLD functional MRI (linear
-anatomical alignment), and Raw BOLD functional MRI (non-linear anatomical
-alignment). The corrected and aligned versions of the data attempt to
+data includes several formats: raw BOLD functional MRI, BOLD functional
+MRI (with applied distortion correction), BOLD functional MRI (linear
+alignment: affine transformation), and BOLD functional MRI (non-linear
+alignment: affine transformation and non-linear warping). The corrected and aligned versions of the data attempt to
 eliminate device and scan related noise. Scan data is accessible in nibabel
 compatible formats (.NII).
 
@@ -103,6 +105,10 @@ experiment as a whole, including a German audio description of the stimulus
 and a csv file with scene information, including the timestamp of the
 beginning of each scene, the scene location, whether the scene took place
 during the day or night, and whether the scene was interior or exterior.  
+
+The original scenes file contained an error: one scene was labeled `DAY' for 
+the interior/exterior column.  We contacted Hanke via Github issue, and he told us the correct 
+label was `EXT' for that scene.  
 
 \subsection{Selecting the Data}
 Because there were various versions of the
@@ -116,122 +122,100 @@ background to better preprocess the data, we at first simply used the non-linear
 alignment version of the data provided by Hanke et al.
 \cite{hank2014audiomovie}.
 
-\subsection{Extracting Data} 
-\begin{center}                                                                  
-\includegraphics[height=8cm]{1}                                                 
-\end{center}                                                                    
-                                                                                
-With regard to our day/night prediction analysis, we will be only working with  
-the first subject for now for testing purposes, but if time had allowed, we     
-would have ran our code on a couple of other subjects for comparison testing.   
-However, for our reproduction analysis, we will be working with five subjects.  
-To ensure speedy access to other subjects' datasets, our strategy for getting 
-all the data entails each group member spending downloading a different quarter 
-of the overall dataset, and then locally transferring the remaining 
-three-quarters of the data from our hard drives.  After we had already 
-downloaded the data for all twenty subjects, we found the data online at 
-studyforrest.org, which allowed us to only download the files we needed, as 
-opposed to the entire data file for each subject.  
-
-We will not be using all of the data. The data files are very large: for each 
-subject, the download size is approximately 16 GB, and that does not even 
-include unzipping all the file inside. Given that we have twenty subjects, 
-downloading all of this could be a paper in it of itself. Since the focus of 
-this class is mainly fMRI data, we decided to ignore everything else. However, 
-the fMRI data is still not of a trivial size because three versions of the data 
-are included: the raw data, the linear alignment, and the non-linear alignment. 
-
-At first, we used the non-linearly aligned data provided by Hanke et al, as
-mentioned above.  However, after talking to Matthew Brett, about these plots, 
+However, after talking to Matthew Brett about the following plots, 
 we decided to use the data kindly preprocessed by Russ Poldrack and the OpenfMRI
-group.  These plots show there may be an artifact in the data.  This image is 
-supposed to show the day/night regressor. It is remarkably gray both inside and 
-outside the head.  This is certainly possible, since not every voxel will have 
-a signal difference between day and night volumes.  However, this image also 
-looks nearly identical to the linear drift image, which seems to indicate great
-activation in the scalp.  
-\begin{center}                                                                  
-\includegraphics[height=8cm]{1}                                                 
-\end{center}    
+group.  These plots show there may be an artifact in the data.  This image shows
+the day/night regressor (as explained in the Classification section) and seems
+to indicate great activation in the scalp.  Furthermore, it looks remarkably like the linear drift regressor, which also shows a white ring along the scalp
+next to a black region, suggesting that the participant moved backwards and to
+the left and that Hanke et al.'s preprocessed data could be better motion-corrected.
+\begin{figure}[H]                                                               
+\caption{Day/Night Regressor}                                                   
+\centering                                                                      
+\includegraphics[height=8cm]{day_night_artifact.png}                            
+\end{figure}   
 
-\begin{center}                                                                  
-\includegraphics[height=8cm]{1}                                                 
-\end{center}    
+\begin{figure}[H]                                                               
+\caption{Linear Drift Regressor}                                                   
+\centering                                                                      
+\includegraphics[height=8cm]{linear_drift_artifact.png}                            
+\end{figure}  
 After reading how Hanke et al. corrected for motion, namely, adjusting the 
 scanner itself when participants moved, instead of modeling for their motion, 
-which is less prone to error, Matthew suggested we use the OpenfMRI data, 
-which corrects for motion using a highpass filter.
-
-The original scenes file contained an error: one scene was labeled 'DAY' for 
-the interior/exterior column.  We contacted Hanke, and he told us the correct 
-label: 'EXT' for that scene.     
+which is less prone to error, Matthew suggested we use the preprocessed data
+provided by the OpenfMRI group, 
+which corrects for motion using a high-pass filter.
    
-\subsection{Preprocessing Data}                      
-
-Hanke et al. preprocessed the data for us by creating an EPI group template.    
-They aligned each image to the first image for each individual, then aligned    
-all brains using FLIRT.  However, we thought it would still be a good idea to   
-model the noise created by linear drift.  This subject moved backwards and to   
-the left, but the data does look quite messy.  It appears as though the fMRI    
-is picking up signal from outside the subject's head.
+\subsection{Preprocessing Data}             
+fMRI data is noisy, so preprocessing is essential.  In fact, without preprocessing, 
+we cannot make any meaningful inferences, since we could be making inference on 
+the noise, not the BOLD signal.  There are many sources of noise in fMRI data in general:
+activation from outside the brain, subject motion, subject physiology (i.e. heart 
+rate and respiration), and scanner noise.  We corrected for activation from outside the brain using a brain mask, as described below.  Poldrack and the OpenfMRI group 
+preprocessed the data by correcting for motion, removing low frequency drifts/noise, and registering the data to a standard anatomical template (the MNI template).  We 
+also corrected for motion over and above this preprocessing for the classification
+analysis by including a linear drift term in our deisgn matrix.
+Additionally, there were some sources of noise specific to our dataset, like
+having 8 runs per subject, which we corrected for as described below.
 
 \subsubsection{Brain Mask}
-In order to be certain we were only picking up signal from inside the subject's
-head, we created a brain mask.  Looking at only the first subject, we plotted 
+In order to be certain we were only looking at BOLD signal from inside the subject's
+brain (since we are interested in imaging the brain), we created a brain mask. Looking at only subject 1, we plotted 
 the mean volume over time as a histogram and selected a threshold 
-of 160 to pick voxels that are inside the brain.  
-\begin{center}                                                                  
-\includegraphics[height=8cm]{subj_1_vol_mean_histogram.png}         
-\end{center} 
-There is no clear-cut boundary here, as there are voxels with moderate degrees of activation in the 100-200 range; however, when we plot our brain mask, it 
-looks like it is roughly brain-shaped.
-\begin{center}                                                                  
-\includegraphics[height=8cm]{brain_mask.png}         
-\end{center} 
-
-We chose to use the first subject to generate the brain mask for a few 
-reasons.  1) The classification analysis will only be looking at the first
-subject.  2) Since the data provided by Poldrack and the OpenfMRI project 
+of 150 to select for voxels that are inside the brain.
+\begin{figure}[H]                                                               
+\caption{Mean Volume Over Time for Subject 1}                        
+\centering                                                                      
+\includegraphics[height=8cm]{subj_1_vol_mean_histogram.png}   
+\end{figure}  
+There is no clear-cut boundary here, as there are voxels with moderate degrees of activation in the 100-200 range, but we selected 150 because 1) it seems to be the
+lowest point between those two peaks at around 30 and 300, and 2) it is in the middle
+of that 100-200 range.  When we plot our brain mask, it 
+looks like that threshold has done a good job of selecting voxels within the brain. 
+\begin{figure}[H]                                                               
+\caption{Brain Mask Using Data from Subject 1}    
+\centering                                                                      
+\includegraphics[height=8cm]{brain_mask.png}                            
+\end{figure}  
+We chose to use subject 1 to generate the brain mask for a few 
+reasons.  1) The classification analysis will only be looking at subject 1, so we wanted to be sure we evaluated all the voxels in the brain for that analysis.  2) Since the data provided by Poldrack and the OpenfMRI project 
 group preprocessed all the data by registering it to a standard anatomical 
 template, we made the assumption that the brain mask for one subject 
-should work for all the subjects.
+should work for all the subjects. Therefore, when calculating voxel-wise correlations between pairs of subjects, we only consider voxels that are within the brain region according to the mask generated by subject 1.
 
 \subsubsection{Concatenating Across Runs}
-Due to the length of the movie, the stimulus was split up into eight segments,  
-each approximately fifteen minutes long, and each participant listened to four  
-segments on two separate days while lying in the fMRI scanner.  At every        
-segment boundary except for the first, Hanke et al. repeated at least the last 
-six seconds between the beginning and end of each segment so there would be a 
-short overlap between segments.  They also removed the first and last four 
-volumes of the data for each run, presumably to account for the overlap 
-between segments, although it is not entirely clear from their article.  In 
-order to have more data for our machine learning training set, and in order to 
-more easily determine which volumes took place during the day and which took 
-place during the night, we concatenated the eight runs together and removed the
-first and last four volumes of each run, as Hanke et al. did with their data.
+Due to the length of the movie, the stimulus was split up into eight runs,  
+each approximately fifteen minutes long. The participants listened to four  
+runs on two separate days of fMRI scanning.  At every        
+run boundary except for the first, Hanke et al. repeated at least the last 
+six seconds of movie audio between the beginning and end of each segment so there would be a 
+short stimulus overlap between runs. In the original analysis, they removed the first and last four 
+volumes of the data connecting each run, presumably to account for the overlap 
+between segments, although it is not entirely clear from their article. Consequently, for our analysis we also removed the first and last four 
+volumes of the data connecting each of the eight runs and concatenated the data into a single file. 
 
 \subsubsection{Smoothing}
-
-We smoothed the data before performing any analyses by applying a Gaussian      
-filter.  While filters may smooth temporally or spatially, we have chosen to    
-only smooth spatially, as the temporal signal is already noisy.  This spatial  
+We smoothed the data spatially before performing any analyses by applying a Gaussian      
+filter. There are two main motivations for spatial smoothing: first a spatial Gaussian
 filter smooths the signal between adjacent voxels, addressing                   
-our assumption that adjacent voxels are not independent.  The   
-Gaussian filter from the scipy.ndimage module smooths the data in terms of      
-standard deviation.  It is conventional in fMRI studies to smooth in terms of mm, 
-so we first had to convert mm into SDs in order to apply this  
-Gaussian filter.
+our assumption that neighboring voxels are not independent. Since the original scans were conducted at very high, 7-Tesla resolution, smoothing mitigates IID scanner noise across voxels. Second, spatial smoothing addresses the concern that subjects’ brains are not anatomically the same shape. The effects of small differences in brain shape can be reduced by smoothing since as the brain becomes blurrier, precise shape differences between subjects become harder to discern. The Gaussian filter from the scipy.ndimage module smooths the data in terms of voxel standard deviations, however it is conventional in fMRI studies to smooth in terms of millimeter full-width-half-maximum (FWHM).  Therefore, we first had to convert mm FWHM into mm SDs, and then convert mm SDs into voxel SDs by computing the width of each voxel in millimeters in all three directions from the affine transformation.
 
-There are two versions of smooth data, one for the reproduction analysis, and
-one for the classification analysis.  We smoothed using 8 mm along each axis
-for the reproduction analysis, and 4 mm along each axis for the classification
+We produced two versions of smooth data, one for the reproduction analysis, and
+the other for the classification analysis.  We smoothed using 8 mm in FWHM along each axis
+for the reproduction analysis, and 4 mm in FWHM along each axis for the classification
 analysis.  For the reproduction analysis, we are taking correlations between
-subjects at the voxel level, so we want to make sure we have the right signal for each voxel.  For the classification analysis, we just want to be able to remove the noise, so we 
-applied a much more conservative filter.
+subjects, so we need to smooth more to adjust for brain shape differences. For the classification analysis, we just want to smooth out scanner noise, so we applied a more conservative filter. The intuition for using 8mm and 4mm respectively was provided by JB Poline, a domain expert.
+
+Note: smoothing does not take treat edge voxels any differently from voxels in the 
+interior of the brain.  Therefore, some voxels outside the brain will be activated.  
+According to Ross Barnowski and Matthew Brett, who we contacted via Github issue, 
+this is not a huge issue, and in fact, most brain imaging studies ignore this 
+problem.  The brain mask also mitigates the issue, since we have already selected 
+for only the voxels that are inside the brain.
 
 \subsubsection{Reshaping}
 Once we have preprocessed the data by concatenating the data and smoothing it,
-we reshape it to a 2D array: number of voxels (1,108,800) by time (3543).
+we reshape it to a 2D array: number of voxels (1,108,800) by time (3543). Working with a flattened matrix allows us to vectorize correlations between subjects and takes the form of the transpose of the design matrix for classification.  
 
 \section{Reproduction}
 
@@ -242,134 +226,98 @@ other words, their analysis measures brain pattern correlation between
 subjects who listened to \emph{Forrest Gump}. Hanke et al. identifies two 
 methods for measuring correlation. The first method takes the BOLD time-series 
 and calculates the voxel-wise Pearson correlation and the second method employs
-"representational similarity analysis to identify 2nd-order isomorphisms in
+``representational similarity analysis to identify 2nd-order isomorphisms in
 the response patterns across brains"\cite{hank2014audiomovie}.  Since the first 
 technique is simpler, we chose that to be the portion of the analysis we tried 
 to reproduce. 
 
 \subsubsection{Data}
 Although 20 subjects were scanned, Hanke et al. excluded subjects 4 and 10 
-from the paper since data was missing\cite{hank2014audiomovie}. With the 18 
+from their correlation analysis because some data for those two subjects is missing\cite{hank2014audiomovie}. With the 18 
 remaining subjects there are 153 pairs (18 choose 2) for which voxel-wise 
 correlations are calculated. Hanke et al. calculated correlations on linearly 
-and non-linearly aligned raw data. Instead of using the paper's raw data, which 
-was applied through a bandpass filter, we used a version of the raw data 
-provided by the OpenfMRI group which was non-linearly aligned and applied 
-through a highpass filter.
+and non-linearly aligned raw data. Additionally both versions of the raw data were applied through a bandpass filter. Hanke et al. did not perform Gaussian smoothing on their data. 
 
-The main challenge in reproducing the paper's analysis resides in the large
-amount of data that must be processed. Since subjects were scanned at 7 Tesla,
-the brain images have a very high resolution, and therefore are large. The
-full two hour scan for each subject is approximately 7.5 GBs, meaning 153
-pairs of 2 x 7.5 GB files must be processed. A seemingly trivial calculation
-of computing correlations between a set of voxels is difficult at this paper's
-scale. On an Intel core i7 (1.7 GHz) machine with 8 GBs of RAM, preprocessing
-(concatenating runs and converting the 4D image to 2D) takes approximately 30
-minutes per subject. Calculating the correlations between a pair of subjects
-takes 10 minutes (8 minutes to load both subjects time courses into memory and
-2 minutes to calculate the Pearson correlations for all the voxels).  To
-combat these concerns, we used python's multiprocessing module to parallelize
-the reshaping of 4D to 2D arrays in the preprocessing step and parallelize the
-calculating of correlations between subjects. Additionally, we ran our
-analysis on Amazon EC2 instances with memory capacities large enough to fully
-load both two hour time courses for each subject in the pair being considered.
-By renting multiple EC2 instances, we are able to parallelize the
-preprocessing work enabling multiple subjects to be preprocessed once.
-
-Since rerunning our preprocessing and correlation code may take several hours
-depending on one's machine, we defined a UNIX environment variable called
-STAT159\_CACHED\_DATA. If this variable is set to 'True', then our python
-scripts will look to see if preprocessed versions of the data exist in the
-/data/processed directory and use those instead of recomputing them. If
-however one wants to fully recompute everything, merely setting
-STAT159\_CACHED\_DATA to 'False' will ensure that all python scripts do not
-use data files that have already been computing. If the user does not specify
-STAT159\_CACHED\_DATA, the default behavior is to use cached files. Enabling
-the user to easily choose whether or not to recompute intermediary data files
-is consistent with the reproducible paradigm this course emphasizes.
-
-Because of our memory and storage limitations, we decided to only calculate 
-correlations between five subjects, subjects 1-3 and 5-6, since subject 4 
-had missing data, as mentioned above.  In addition, we wanted to pick 5 
+For our reproduction, we are using 8 mm FWHM smoothed data as described in the preprocessing section of this paper. As a reminder to the reader, this data has been passed through a high-pass filter and is non-linearly aligned in addition to the smoothing we conducted ourselves. Because of memory and storage limitations, we decided to only calculate 
+correlations between five subjects: subjects 1-3 and 5-6, since subject 4 
+had missing data, as noted above.  In addition, we wanted to pick 5 
 subjects who were representative of the general population.  These five 
 subjects include both males and a female, and subjects in the 20-25, 25-30,
 and 30-35 age brackets, which is relatively diverse for this sample.
 
+Our fMRI data measures BOLD signal, not the neural signal itself, and it takes
+some time for the blood oxygenation to change once a scene has changed.  To 
+compensate for this delay, we removed the first 2 volumes after each flip from 
+` `Interior" to ` `Exterior" or vice versa, a total of 4 seconds, since our TR is 2 
+seconds.  For example, the first scene takes place in the savannah (outside), and the second takes place in the doctor's office (inside).  The scene in the doctor's office
+started at 272 seconds, so we removed the first four, and only looked at the BOLD
+signal starting from 276 seconds.
+
 \subsection{Analysis}
-With 5 subjects, we will have 10 pairs (5 choose 2) 
-in total, between each combination of those five subjects, rather than the 153
-(18 choose 2) pairs Hanke et al. used.  We did not believe we would lose much
-information by running the analysis on just five subjects rather than eighteen.
+With 5 subjects, we have 10 pairs (5 choose 2) 
+in total rather than the 153
+(18 choose 2) pairs Hanke et al. used for calculating inter-subject correlation.  Although we reduced to 5 subjects because of system constraints, we believe that working with 5 subjects should still yield results consistent with those published by Hanke et al.
 Thus, our voxel-wise inter-brain correlation was determined for 10 pairs as the 
-Pearson correlation of the time courses for all voxels, a total of 1,108,800.
-Hanke et al. reported values for the pooled and means voxel-wise inter-
-individual correlation at various percentiles for both the linear and 
-non-linear anatomical alignments.  
+Pearson correlation of the time courses for each voxel, yielding a total of 1,108,800 (number of voxel) correlation values for each subject pair.
+Hanke et al. reported values for the pooled and mean voxel-wise inter-individual correlation at various percentiles for both the linear and 
+non-linear anatomical alignments. `Pooled' correlation values are found by taking the union of all 1,108,800 correlations from each subject pair, yielding 11,088,000 values whereas `mean' correlation values average respective voxels, maintaining 1,108,800 values. 
 
-We will be running the inter-brain correlations for these 10 pairs at the 
-levels using the preprocessed data provided by Poldrack and the OpenfMRI 
-project, and will compare our result at the 0, 25, 50, 75, 90, 95, 99, 99.5, 
-and 100\% percentiles to that of Hanke et al.
+Before continuing with calculating voxel time-course correlations an important caveat must be considered. Taking correlations across the entire 2 hour time-course might be adversely affected by arbitrary run differences. We demonstrate this potential issue via simulation. Suppose we have a voxel time-course for subject a and subject b across 2 runs. Each run contains 100 volumes. Further suppose the values from the first run are distributed iid $Normal(5, 2)$ and values from the second run are distributed iid $Normal(10, 2)$ where subject a's values are independent from subject b's values. The figure below visualizes this simulation.
 
-Simply concatenating the eight runs together led to a runs effect, since there
-is some variability due to the signal coming from the same run. To correct for 
-this, we took our 2D data of voxels against time (V x T), and took the 
+\begin{figure}[H]                                                               
+\caption{Runs Effect Simulation}                                                   
+\centering                                                                      
+\includegraphics[height=8cm]{simulation.jpg}                            
+\end{figure}  
+
+The correlation between the 2 subjects across the both runs is 0.6336, which
+seems relatively high. Indeed it would seem to indicate that the subjects' voxels are activated 
+roughly the same amount at the same times. However, there is a confounding
+factor of the difference in signal between the two runs.  To investigate that
+confounding factor, we look at the correlations within each run separately.  
+The correlation between the two subjects within the first run is -0.236, and 
+the correlation between the two subjects within the second run is 0.0883.  
+Thus, the relatively high overall correlation of 0.6336 between the 2 subjects 
+is actually a measure of the difference between runs, not the correlation 
+between subjects.
+
+
+Since run segments could arbitrarily affect voxel time-course correlations as shown in the example above, we need to test whether our data does in fact contain arbitrary behavior due to run segmentation. We took our 2D data of voxels by  time (V x T), and took the 
 difference between signal from one volume to another, giving us a 2D array of 
 V x (T-1), or 1,110,880 by 3542. To get a measure of the signal of the brain at 
 every point in time, we took the RMS across all voxels for a particular time to 
-get a 1D array of length (T-1), or 3542. 
+get a 1D array of length (T-1), or 3542. Below is the plot of the RMS error for each of the 3542 points using data from subject 1. 
 
-\begin{center}                                                                  
-\includegraphics[height=8cm]{9}                                                 
-\end{center}   
+\begin{figure}[H]                                                               
+\caption{RMS Error Demonstrating the Runs Effect}   
+\centering                                                                      
+\includegraphics[height=8cm]{runs_effect.jpg}                            
+\end{figure}  
 
-To demonstrate this effect, we plotted the RMS error for each of 3542 points.  
-This plot shows the runs effect from subject 1.  There are seven clear spikes, 
+There are seven clear spikes, 
 representing the seven points between runs.  The highest point is the fourth 
 one, which is the point between the first day of fMRI imaging and the second
 day.  Thus, it is clear that there is a difference in signal between runs and
 we need to correct for it.  
 
-We correct for the runs effect by taking the average of the correlation 
-coefficients across each run.  To demonstrate how we came to this solution, 
-we ran a simulation with just two runs of 100 time points each for just two 
-subjects, using a signal mean of 5 for the first run and 10 for the second.  
-\begin{center}                                                                  
-\includegraphics[height=8cm]{10} 
-\end{center}  
-The correlation between the 2 subjects across the entire run is 0.6336, which
-seems relatively high, indicating that the subjects' voxels are activated 
-roughly the same amount at the same times.  However, there is a confounding
-factor of the difference in signal between the two runs.  To investigate that
-confounding factor, we looked at the correlations within each run separately.  
-The correlation between the two subjects within the first run is -0.236, and 
-the correlation between the two subjects within the second run is 0.0883.  
-Thus, the relatively high overall correlation of 0.6336 between the 2 subjects 
-is actually a measure of the difference between runs, not the correlation 
-between subjects.  To solve this problem, we will take the average across the 8
-runs to be the correlation coefficient.
+We look to our simulation to find an answer for correcting against the runs affect. If we calculate correlation for a voxel within respective runs and then average those values, we will get more sensible results. Concretely, in our simulation if we average -0.236 and 0.0883, we get a correlation of -0.07385 for the overall voxel time-course, which is much more sensible than 0.6336. Therefore, when calculating inter-subject correlation for a voxel, we will calculate 8 correlations (within respective runs for that voxel) and then average those values together to yield the overall voxel time-course correlation.
 
-We calculate the correlation coefficient for each pair and plot the entire
-distribution.  There are two versions of the correlation coefficient 
-distribution.  The first is pooled, which dumps all correlations together, 
-and the second is mean, which takes the average of all voxel correlations.  
-Thus, there are 10 times the voxel correlations for the pooled version as for 
-the mean version.
-
-From those two distributions, we calculate the correlation coefficient at
-various percentiles, including 0, 25, 50, 75, 90, 95, 99, 99.5, and 100\%,
-for both the pooled and mean correlation coefficient distributions.
+To measure our correlation results, will calculated the pooled and mean correlation values and compare our result at the 0, 25, 50, 75, 90, 95, 99, 99.5, 
+and 100\% percentiles to that of Hanke et al. In considering percentiles from the set of voxel correlation values, we only look at values from correlations that where within subject 1's brain, as defined by our brain mask, ensuring that we are only reporting on data generated by the brain and not noise. According to
+Hanke et al., using this threshold procedure as a measure of statistical 
+significance ``has prove to be robust compared to classical testing" \cite{hank2014audiomovie}.
 
 \subsection{Results}
-
-\begin{center}                                                                  
-\includegraphics[height=8cm]{pooled_correlation_histogram} 
-\end{center}  
-Pooled correlation
-\begin{center}                                                                  
-\includegraphics[height=8cm]{mean_correlation_histogram} 
-\end{center}  
-Mean correlation
+\begin{figure}[H]                                                               
+\caption{Pooled Correlation Coefficients}
+\centering                                                                      
+\includegraphics[height=8cm]{pooled_correlation_histogram}
+\end{figure}  
+\begin{figure}[H]                                                               
+\caption{Mean Correlation Coefficients}
+\centering                                                                      
+\includegraphics[height=8cm]{mean_correlation_histogram}                            
+\end{figure}  
 
 These correlation coefficients are both centered slightly right of
 0, which we expect, since we expect there to be a weak inter-subject
@@ -378,20 +326,20 @@ correlation for most voxels.
 From those correlation coefficient distributions, we calculated the 
 correlation coefficients at the 0, 25, 50, 75, 90, 95, 99, 99.5, and 100\%
 percentiles, as can be seen in the table below.
-\begin{table}[ht]
+\begin{table}[H]
   \centering
   \caption{Our Results}
   \label{tab:table1}
   \begin{tabular}{cccccccccc}
     percentile & 0 & 25 & 50 & 75 & 90 & 95 & 99 & 99.5 & 100\\
     \hline
-    pooled & -0.470 & -0.015 & 0.032 & 0.088 & 0.156 & 0.208 & 0.333 & 0.384 & 0.652\\
+    pooled & -0.444 & -0.005 & 0.041 & 0.098 & 0.171 & 0.232 & 0.370 & 0.419 & 0.652\\
     \hline
-    mean & -0.075 & 0.006 & 0.027 & 0.059 & 0.101 & 0.143 & 0.291 & 0.347 & 0.543\\
+    mean & -0.074 & 0.012 & 0.035 & 0.070 & 0.125 & 0.186 & 0.342 & 0.387 & 0.543\\
   \end{tabular}
 \end{table}
 
-\begin{table}[ht]
+\begin{table}[H]
   \centering
   \caption{Results reported by Hanke et al.}
   \label{tab:table2}
@@ -400,12 +348,12 @@ percentiles, as can be seen in the table below.
     \hline
     pooled & {-0.412} & {-0.013} & 0.008 & 0.031 & 0.056 & 0.078 & 0.163 & 0.207 & 0.719\\
     \hline
-    mean & -{0.008} & 0.002 & 0.005 & 0.013 & 0.032 & 0.052 & 0.103 & 0.126 & 0.269\\
+    mean & {-0.008} & 0.002 & 0.005 & 0.013 & 0.032 & 0.052 & 0.103 & 0.126 & 0.269\\
   \end{tabular}
 \end{table}
 
-Our correlations appear to differ from Hanke et al.'s reported numbers.  In 
-general, our numbers are higher than theirs.
+Our correlations appear to differ slightly from Hanke et al.'s reported numbers.  In 
+general, our numbers are higher in magnitude than theirs, but are still within a reasonable distance from theirs.
 
 Once we had that correlation coefficient percentiles, we applied a threshold of 
 percentile rank of 95\% to get voxels with a relatively high correlation 
@@ -413,16 +361,31 @@ coefficient.  In our data, the 95th percentile corresponds to r = 0.0143 for
 the mean correlation coefficient distribution.  Voxels with a correlation
 coefficient above this threshold were coded blue, and all other points 
 were coded gray, as shown below.  
-\begin{center}
-\includegraphics[height=8cm]{correlated_brain.png}
-\end{center}
+\begin{figure}[H]                                                               
+\caption{Our Area of Maximum Inter-Brain Time-Series Correlation (at the 95\% level)}
+\centering                                                                      
+\includegraphics[height=8cm]{correlated_brain.png}                            
+\end{figure}  
+
+Hanke et al.'s inter-individual response similarity analysis yielded a similar region, as seen in their figure below: the Planum Temporale\cite{hank2014audiomovie}.
+\begin{figure}[H]                                                               
+\caption{Hanke et al.'s Area of Maximum Inter-Brain Time-Series Correlation (at the 95\% level)}
+\centering                                                                      
+\includegraphics[height=8cm]{hanke_temporal_cortex.png}                            
+\end{figure}  
 
 \subsection{Discussion}
+According to Hanke et al., the region that appeared to be highly similar 
+between individuals in this study in both our analysis and theirs, the Planum Temporale, is known to be involved in 
+` `processing complex sounds and speech,"\cite{hank2014audiomovie} such as one 
+might hear while listening to an auditory movie.  Other studies besides 
+Hanke et al.'s affirm that the areas we saw with the highest inter-subject
+correlation appear to be activated by complex auditory stimuli\cite{chevillet2011functional}.
 
 We have a few hypotheses as to why our correlation coefficients are 
 higher than those reported by Hanke et al.  1) We used 
 different motion-corrected data: they used a bandpass filter, while we 
-used the preprocessed data provided by Matthew, which used a highpass
+used the preprocessed data provided by Poldrack and the OpenfMRI project group, which used a high-pass
 filter.  2) We used a Gaussian filter to smooth the data; they do not 
 indicate using any filter to smooth the data in their paper.  Smoothing 
 spatially should increase the correlation between subjects, possibly 
@@ -440,16 +403,13 @@ written text of the paper do not line up with the values they report in
 their table.  For example, Hanke et al. reports the mean correlation 
 coefficient values at the 95\% level as r = 0.076 (linear) and r = 0.078 
 (non-linear) at the supplemental table shown online here: \href{http://www.nature.com/articles/sdata20143/tables/5}{Voxel-wise Inter-individual Correlation Table}, and r = .077 (linear) 
-and r = .086 (non-linear) in the paper.  We contacted Hanke, and he acknowledged 
+and r = .086 (non-linear) in the paper.  We contacted Hanke via Github issue, and he acknowledged 
 the discrepancy, but has yet to get back to us on which is the correct value.  
 
-The areas of the brain that are blue are similar to the areas shown in Hanke 
-et al.'s paper, namely, the Planum Temporale (PT) in the temporal cortex of both 
-hemispheres.  According to Hanke et al., that region is known to be involved in 
-"processing complex sounds and speech,"\cite{hank2014audiomovie} such as one 
-might hear while listening to an auditory movie.  Other studies besides 
-Hanke et al.'s affirm that the areas we saw with the highest inter-subject
-correlation appear to be activated by complex auditory stimuli\cite{chevillet2011functional}.
+A future study could run pairwise correlations between all 18 subjects and compare 
+those values to that of Hanke et al.  These differences from Hanke et al.'s study suggest that changes such as those mentioned above can have an impact on the final
+result, and it is incredibly important to think through all decisions in scientific
+research.  
 
 \section{Classification}
 
@@ -457,7 +417,7 @@ In addition to reproducing Hanke et al.'s analysis, we also wanted to
 conduct our own, based on personal interest and ability.
 
 After perusing all the stimulus-related data (e.g. data annotating each 
-\emph{Forest Gump} scene and when a subject was exposed to that scene), we 
+\emph{Forrest Gump} scene and when a subject was exposed to that scene), we 
 decided to guide part of our analysis to see if we could
 summarize any interesting trends in fMRI response with respect to these
 features. We selected a single subject, Subject 1, to perform classification
@@ -468,38 +428,28 @@ classify volumes across individuals.
 We used this information and the fMRI data to select features with the goal of
 building the best possible predictor of certain aspects of a movie scene given
 fMRI data. We wanted to be able to accurately predict whether a particular
-movie scene falls under one of two categories: day or night, or interior or 
+movie scene falls under one of two categories: interior or 
 exterior.  Our plan of action was to 1) select voxels that seemed to differ most 
 between the two groups as features, and 2) use machine learning to classify 
-volumes as belonging to one of two groups (i.e. day or night).
+volumes as belonging to one of two groups (i.e. interior or exterior).
 
-We began with the analysis for predicting day and night volumes, and then
-applied the same analysis to predicting interior and exterior volumes.  
-Since both day/night and interior/exterior are binary, the analysis is
-exactly the same.
-
-\subsection{Classification of Day/Night}
+\subsection{Classification of Interior/Exterior}
 
 \subsubsection{Feature Selection}
 
 To select voxels as features for our classification problem, we first
 determined which volumes corresponded to parts of the movie that took place 
-during the day and which volumes corresponded to parts of the movie that took place 
-during the night, using the scenes.csv file provided by Hanke et al., as 
-described in the data section, and added that as a column in our design matrix.  
+indoors (interior) and which volumes corresponded to parts of the movie that took place 
+outdoors (exterior), using the scenes.csv file provided by Hanke et al., as 
+described in the data section, and added that as a column in our design matrix. 
 In order to account for baseline BOLD and any linear drift created by the subject 
-moving in the scanner, we also included those two regressors in the design matrix.  
-
-\begin{center}
-\includegraphics[height=8cm]{2}
-\end{center}
-
-The figure above shows the design matrix with the following columns: a column of 
-ones for the intercept, linear drift, and day (1) or night (0)
+moving in the scanner, we also included those two regressors in the design matrix.
+Thus, our design matrix has 3 columns: a column of 
+ones for the intercept, linear drift, and the boxcar function for our column of interest: interior (0) or exterior (1).
 
 We then performed a t-test for each voxel to determine if the BOLD signal is
-significantly different between day volumes and night volumes.  Our null 
-hypothesis is that there is no difference between day and night volumes.
+significantly different between interior volumes and exterior volumes.  Our null 
+hypothesis is that there is no difference between interior and exterior volumes.
 This gave us an array of t-statistics, one for each voxel, a total of 1,108,800.
 We took the absolute value of the t-statistics because are only interested in
 if the voxel has a different BOLD signal than 0, not whether it is higher or 
@@ -516,39 +466,11 @@ certain voxels are significantly different between the two groups, we did not
 correct for multiple comparisons.  If we were interested in the significance
 of certain voxels, we would apply a Bonferroni correction.
 
-\begin{center}
-\includegraphics[height=8cm]{3}
-\end{center}
-
-The figure above is the largest 32 t-statistics.
-
-The time course for the voxel with the highest t-statistic looks very noisy.
-We can compare it to the stimulus (day) time course, but there is no obvious
-relationship.
-
-
-\begin{center}
-\includegraphics[height=8cm]{4}
-\end{center}
-
-The figure is the time course for the voxel with the highest t-statistic.
-
-\begin{center}
-\includegraphics[height=8cm]{5}
-\end{center}
-
-The figure is the day-night time course for Task 1, Run 1.  Very few scenes
-take place at night for this run.
-
 We wanted to know which areas of the brain seemed to be most inclined to pick
-up on the difference between day and night.  Thus, we plotted the betas
-testing the hypothesis that there is no difference between day and night for
-each voxel.  Unfortunately, this looks very similar to our linear drift image,
-where there appears to be an artifact.
+up on the difference between interior and exterior scenes.  Thus, we plotted the 
+betas testing the hypothesis that there is no difference in BOLD signal between 
+interior and exterior volumes for each voxel.  Unfortunately, this looks very similar to our linear drift image, where there appears to be an artifact.
 
-\begin{center}
-\includegraphics[height=8cm]{7}
-\end{center}
 
 \subsubsection{Random Forest}
 
@@ -566,93 +488,85 @@ two runs for a given participant.
 
 \subsubsection{Results}
 
-I think we can cut this?
+\begin{table}[H]
+  \centering
+  \caption{Cross-validation Accuracies}
+  \label{tab:table3}
+  \begin{tabular}{cc}
+    Number of Features & CV Accuracy\\
+    \hline
+    500 & 0.9155\\
+    \hline
+    1000 & 0.91480\\
+    \hline
+    2500 & 0.9211\\
+    \hline
+    5000 & 0.9259\\
+    \hline
+    10000 & 0.9288\\
+    \hline
+    20000 & 0.9277\\
+    \hline
+    30000 & 0.9259\\
+    \hline
+    40000 & 0.9314\\
+    \hline
+    42000 & 0.9310\\
+    \hline
+    44000 & 0.9314\\
+    \hline
+    46000 & 0.9336\\
+    \hline
+    48000 & 0.9299
+  \end{tabular}
+\end{table}
 
-[We began our exploratory data analysis by writing functions
-that plot a slice of the brain at any given time and the standard deviations
-across voxels for individual subjects using Matplotlib. This enabled us, at a
-quick glance, to gauge the variability of the fMRI data.
+The optimal number of features appears to be 4600, since that results in the 
+highest cross-validation accuracy, 93.36\%.  Since random forest is a stochastic 
+algorithm, reproducing this table will result in similar, but slightly different
+cross-validation accuracies.
 
-\begin{center}
-\includegraphics[height=8cm]{7}
-\end{center}
-
-It takes a few minutes to calculate the standard deviation for each volume in
-the 4D array for Subject 1's Task 1, Run 1. This makes sense, as the 4D
-array is (132, 175, 48, 451) in dimension; this means we are calculating and
-plotting 451 standard deviations in total. From the plot above, we can see
-that for this particular run and task, the standard deviations across all 451
-points is within 171 and 173.5. Though this range may seem small, from the
-plot we can see that there is quite of variability within that range of 2.5.
-One possible explanation for this is the varying responses to different movie
-scenes. Some scenes will evoke different reactions and thus different values
-per voxels.
-
-\begin{center}
-\includegraphics[height=8cm]{8}
-\end{center}
-
-So, in order to glean anything remotely useful, we had to narrow down our
-focus. There are 20 subjects with 8 runs each. We limited our initial analysis
-to just one run for one subject in order to conduct hypothesis tests. And
-after parsing the two csv files (scenes.csv and demographics.csv), we then had
-limited data about the movie scenes and personnel about each subject. We
-implemented "Scene Slicer" and "Subject" classes with attributes that were
-unique to each scene or subject.]
-
-Out of the 451 recorded instances of whether a scene was day or night for
-Subject 1 and Task 1, \emph{Forrest Gump} had 390 day slices and 61 night slices and 296 interior slices and 155 exterior slices. Subject 1 is a male 
-who is 30-35 years old and had seen the movie 5 times prior to the study.
-
-The decision tree we created had a prediction accuracy of 83.5\%.  However,
-86.5\% of slices took place during the day, so this first tree is performing
-worse than chance.
-
-\subsection{Classification of Interior/Exterior}
-We followed the same methods for classifying volumes as interior or exterior
-as we did for classifying volumes as day or night.
-
-\subsubsection{Results}
+Seventy-seven percent of the volumes took place outside, so if the random forest
+predicted outside for all volumes, it would have a prediction accuracy of 77\%
+by random chance.  Thus, our random forest with 46000 features is performing much
+better than random chance.
 
 \subsection{Discussion}
-Future studies could investigate if it is possible to train upon one individual 
-to classify volumes from another individual.
+Our classification analysis indicates that it is possible to predict whether a 
+scene takes place inside or outside based on brain state.  We looked at random volumes throughout the 2-hour scan of one individual.  Future studies could investigate if it is possible to train upon one subject 
+to classify volumes from other subjects.
+
+Since day/night is also binary, we could apply the same methods to classify volumes
+as taking place during the day or during the night.  We could also extend the 
+analysis to predicting something not binary, like sentiment: positive, negative, or
+neutral.
+
+Future studies could take the voxels we selected to be feature selectors here, and
+from classifications like the day/night or positive/negative/neutral analyses mentioned previously, and see if it is possible to distinguish individuals on the nature of those three regressors of interest.  For example, since the 20 participants have differing amounts of exposure to \emph{Forrest 
+Gump}, with some participants having never seen the movie before and one 
+participant who had seen the movie 12 times before, perhaps a future study could 
+distinguish between individuals who are ` `familiar" with \emph{Forrest Gump} and individuals who are not using those three regressors of interest (i.e. interior/exterior, day/night, positive/negative/neutral).  However, there
+are a relatively small number of participants, only 20, since fMRI is
+expensive, so the predictive ability of that study would be rather limited.
 
 \section{Conclusion/Overall Discussion}
 
 \subsubsection{Interpretations and Implications}
-what does this mean? both this study and in general
 
-One of the main goals of this course and Hanke et al.'s paper was to use
-reproducible, free methods that promote an open-source environment among
-scientists.  We did attempt to make our code and project as reproducible as
-possible, however, we ran our analyses on Amazon and had to pay around \$100
-for it.  Thus, this study is not exactly reproducible, since the size of the
-data may present a significant barrier to student investigators.
+Hanke et al. specifically only used free, open-source software and was very 
+transparent about his data and methods to facilitate 
+replications and further research by future investigators\cite{hank2014audiomovie}.  We did attempt to make our code and project as reproducible as
+possible; however, we ran our analyses on Amazon and had to pay around \$100
+for it.  Additionally, we only used five subjects for our reproduction analysis,
+and only one subject for our classification analysis, due to the size of the data
+and computational power available to us.  Thus, just as the size of the data presented a significant barrier to us, so might the size of this data present a 
+barrier to the future work Hanke et al. desire to see using this dataset.
 
-\subsubsection{Potential Future Studies}
-
-One initial direction we had hoped to explore was possible differences in
-physiological responses to certain movie scenes by gender and age. However, we
-later had to forgo this idea because doing so required us to process and
-analyze the entire dataset, something that we could not efficiently do given
-our limited computing resources. To be more specific, we would have had to
-comb through around 16 gigabytes worth of data just for one subject. Though
-these were certainly interesting questions, their focus was too broad for us
-to be able to fully address them.
-
-Since the 20 participants have differing amounts of exposure to \emph{Forrest 
-Gump}, with some participants having never seen the movie before and one 
-participant who had seen the movie twelve times before, a future study could 
-examine the difference in voxel activation between participants who had never 
-seen the movie before and those with high amounts of exposure.
-
-Ideally, a future investigator could split the participants into a training
-set and testing set, and predict which participants have limited familiarity
-with the movie, defined as seeing the movie 2 or fewer times.  However, there
-are a relatively small number of participants, only 20, since fMRI is
-expensive, so the predictive ability of that study would be rather limited.
+However, despite our use of only part of the data, we were still able to conduct
+two analyses.  So perhaps Hanke et al. have succeeded in their goal of seeing 
+future work arise from this dataset, although of a limited nature.
 
 \bibliography{project.bib}
 
 \end{document}
+
