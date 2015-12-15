@@ -20,6 +20,11 @@ Since large matrices must be computed and held in memory, systems should have at
 3. Code depends on an internally provided python module module called `stat159lambda`. Ensure this module is on your python path with `export PYTHONPATH='<absolute-path-to-repository>/project-lambda/code'`.  
 For example, `export PYTHONPATH='/Users/alondaks/project-lambda/code'`. We strongly encourage adding your export statement to your `.bashrc` while running this project to ensure the environement variable is defined in all shells. 
 
+
+## Running tests
+To run python unit tests: `make test` from the top level project directory.
+
+
 ## How to run code and analysis
 Please run the follow make commands in order from top to bottom from within the top level project directory.  
 
@@ -36,7 +41,8 @@ Please run the follow make commands in order from top to bottom from within the 
   - `make classification-cross-validate` runs random forrest cross validation and saves cv accuracies to file 
   - `make classification-validation` tests a fully trained random forrest on validation set and saves accuracy to file 
 
-
+## How to generate report PDF
+To generate the PDF report run `make generate-paper` from the top level project directory. To remove remove intermediary latex files run `make clean-paper`
 
 ## Collaborators
 - Alon Daks ([`alondaks`](https://github.com/alondaks))
