@@ -29,7 +29,7 @@ To run python unit tests: `make test` from the top level project directory.
 Please run the follow make commands in order from top to bottom from within the top level project directory.  
 
 1. Download and verify data    
-  - `make data` fetches and downloads raw data  
+  - `make download-data` fetches and downloads raw data  
   - `make validate-data` verifies data integrity against known checksums  
 2. Preprocess the data 
   - `make preprocess` concatenates runs, applies guassian filter, and reshapes data to 2d 
@@ -40,6 +40,8 @@ Please run the follow make commands in order from top to bottom from within the 
 5. Classification 
   - `make classification-cross-validate` runs random forrest cross validation and saves cv accuracies to file 
   - `make classification-validation` tests a fully trained random forrest on validation set and saves accuracy to file 
+
+To run all analysis excluding data download and verification (steps 2-5 only): `make all-analysis`
 
 ## How to generate report PDF
 To generate the PDF report run `make generate-paper` from the top level project directory. To remove remove intermediary latex files run `make clean-paper`

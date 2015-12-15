@@ -15,8 +15,8 @@ verbose:
 	nosetests -v code/stat159lambda/ data
 
 
-data:
-	cd data && make data
+download-data:
+	cd data && make download-data
 
 validate-data:
 	cd data && make validate
@@ -26,6 +26,7 @@ preprocess:
 
 eda:
 	python code/stat159lambda/reproduction/inter_run_diagnostics.py
+	python code/stat159lambda/reproduction/brain_mask.py
 	python code/stat159lambda/simulations/correlation_simulation.py
 
 reproduction:
@@ -33,15 +34,13 @@ reproduction:
 	python code/stat159lambda/reproduction/analyze_similarity.py
 
 classification-cross-validate:
-	python code/stat159lambda/classification/rf_cross_validate.py
+	python code/stat159lambda/classification/random_forest/rf_cross_validate.py
 
 classification-validation:
-	python code/stat159lambda/classification/rf_validation.py
+	python code/stat159lambda/classification/random_forest/rf_validation.py
 
-all-analysis:
-	make preprocess
-	make eda
-	make reproduction
-	make classification
-	make classification-cross-validate
-	make classification-validation
+generate-paper:
+	cd paper && make all
+
+clean-paper:
+	cd paper && make clean
