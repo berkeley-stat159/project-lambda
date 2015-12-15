@@ -15,7 +15,7 @@ verbose:
 	nosetests -v code/stat159lambda/ data
 
 
-data:
+download-data:
 	cd data && make download-data
 
 validate-data:
