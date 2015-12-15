@@ -1,4 +1,6 @@
 from __future__ import print_function, division
+import matplotlib
+matplotlib.use('Agg')
 import numpy as np
 from scipy import stats
 import itertools

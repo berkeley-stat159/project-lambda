@@ -1,4 +1,6 @@
 from __future__ import print_function, division
+import matplotlib
+matplotlib.use('Agg')
 import numpy as np
 from stat159lambda.config import REPO_HOME_PATH, NUM_OFFSET_VOLUMES
 from stat159lambda.utils import data_path as dp

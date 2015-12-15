@@ -7,7 +7,7 @@ import sys
 from os.path import exists
 import gc
 from stat159lambda.config import REPO_HOME_PATH, RUN_DIVISIONS, NUM_VOXELS
-from stat159lambda.config import NUM_RUNS, USE_CACHED_DATA, SUBJECTS
+from stat159lambda.config import NUM_RUNS, SUBJECTS
 from stat159lambda.utils import data_path as dp
 from numpy.core.umath_tests import inner1d
 
@@ -75,14 +75,11 @@ def calculate_and_save_correlation(subj_1_num, subj_2_num):
     None
     """
     correlation_path = dp.get_correlation_path(subj_1_num, subj_2_num)
-    if not exists(correlation_path) or not USE_CACHED_DATA:
-        subj_1_data = np.load(dp.get_smoothed_2d_path(subj_1_num, 8))
-        subj_2_data = np.load(dp.get_smoothed_2d_path(subj_2_num, 8))
-        correlations = correlation(subj_1_data, subj_2_data)
-        np.save(correlation_path, correlations)
-        print('Saved {0}'.format(correlation_path))
-    else:
-        print('Using cached version of {0}'.format(correlation_path))
+    subj_1_data = np.load(dp.get_smoothed_2d_path(subj_1_num, 8))
+    subj_2_data = np.load(dp.get_smoothed_2d_path(subj_2_num, 8))
+    correlations = correlation(subj_1_data, subj_2_data)
+    np.save(correlation_path, correlations)
+    print('Saved {0}'.format(correlation_path))
 
 
 def main():
