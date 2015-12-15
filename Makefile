@@ -34,10 +34,10 @@ reproduction:
 	python code/stat159lambda/reproduction/analyze_similarity.py
 
 classification-cross-validate:
-	python code/stat159lambda/classification/rf_cross_validate.py
+	python code/stat159lambda/classification/random_forest/rf_cross_validate.py
 
 classification-validation:
-	python code/stat159lambda/classification/rf_validation.py
+	python code/stat159lambda/classification/random_forest/rf_validation.py
 
 all-analysis:
 	make preprocess
