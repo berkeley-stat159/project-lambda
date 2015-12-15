@@ -38,3 +38,9 @@ classification-cross-validate:
 
 classification-validation:
 	python code/stat159lambda/classification/random_forest/rf_validation.py
+
+generate-paper:
+	cd paper && make all
+
+clean-paper:
+	cd paper && make clean
