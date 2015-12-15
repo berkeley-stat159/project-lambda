@@ -38,11 +38,3 @@ classification-cross-validate:
 
 classification-validation:
 	python code/stat159lambda/classification/random_forest/rf_validation.py
-
-all-analysis:
-	make preprocess
-	make eda
-	make reproduction
-	make classification
-	make classification-cross-validate
-	make classification-validation
