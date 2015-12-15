@@ -25,8 +25,14 @@ class VoxelExtractor:
         will be used.
         """
         self.subject = subject
+        if interest_col_str == "int-ext":
+            self.interest_col_ind = 0
+        elif interest_col_str == "day-night":
+            self.interest_col_ind = 1
+        else:
+            raise ValueError("Incorrect interest column name: please use either 'int-ext' or 'day-night'")
         self.interest_col_str = interest_col_str
-        if not data:
+        if data is None:
             data_path = dp.get_smoothed_2d_path(self.subject, 4)
             data = np.load(data_path)
             data = data[:, NUM_OFFSET_VOLUMES:]
@@ -45,18 +51,11 @@ class VoxelExtractor:
         if self.design is None:
             scene_path = dp.get_scene_csv()
             ss = ssm.SceneSlicer(scene_path)
-            if self.interest_col_str == "int-ext":
-                interest_col_ind = 1
-            elif self.interest_col_str == "day-night":
-                interest_col_ind = 0
-            else:
-                print(
-                    "Incorrect interest column name: please use either 'int-ext' or 'day-night'")
-            interest_col = ss.get_scene_slices()[interest_col_ind]
+            interest_col = ss.get_scene_slices()[self.interest_col_ind]
             n_trs = self.data.shape[-1]
             design = np.ones((n_trs, 3))
             design[:, 1] = np.linspace(-1, 1, n_trs)
-            design[:, 2] = interest_col[NUM_OFFSET_VOLUMES:]
+            design[:, 2] = interest_col[NUM_OFFSET_VOLUMES:NUM_OFFSET_VOLUMES+n_trs]
             self.design = design
         return self.design
 
@@ -114,7 +113,10 @@ class VoxelExtractor:
             df = X.shape[0] - npl.matrix_rank(X)
             MRSS = RSS / df
             SE = np.sqrt(MRSS * c.T.dot(npl.pinv(X.T.dot(X)).dot(c)))
-            SE[SE == 0] = np.amin(SE[SE != 0])
+            try:
+                SE[SE == 0] = np.amin(SE[SE != 0])
+            except ValueError:
+                pass
             t = c.T.dot(beta) / SE
             self.t_values = abs(t[0])
         self.t_indices = np.array(self.t_values).argsort(

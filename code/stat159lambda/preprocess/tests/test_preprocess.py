@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 from stat159lambda.preprocess import preprocess
-from stat159lambda.config import REPO_HOME_PATH
+from stat159lambda.config import REPO_HOME_PATH, SUBJECTS
 from stat159lambda.utils import data_path as dp
 import numpy as np
 import matplotlib
@@ -47,7 +47,10 @@ class ConcatenateRunsTestCase(unittest.TestCase):
     def test_get_affine(self, mock_raw, mock_np_save, mock_np_load):
         mock_raw.return_value = '{0}/testing/test_raw.nii'.format(REPO_HOME_PATH)
         preprocess.get_affine()
-        assert mock_np_save.call_args[0][0] == '{0}/data/affine.npy'.format(REPO_HOME_PATH)
+        if mock_np_load.call_args:
+            assert mock_np_load.call_args[0][0] == '{0}/data/affine.npy'.format(REPO_HOME_PATH)
+        else:
+            assert mock_np_save.call_args[0][0] == '{0}/data/affine.npy'.format(REPO_HOME_PATH)
 
     @patch.object(preprocess, 'apply_gaussian_smooth')
     @patch.object(np, 'load')

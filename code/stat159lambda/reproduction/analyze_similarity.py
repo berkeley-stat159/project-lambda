@@ -106,6 +106,18 @@ def save_correlation_percentiles(aggregation):
 
 
 def correlation_brain_image(outside_brain_value):
+    """
+    Uses a mask to plot only the areas that are the brain itself and saves
+    that image into the figures folder.
+
+    Parameters
+    ----------
+    outside_brain_values : int
+
+    Returns
+    -------
+    None
+    """
     if outside_brain_value < 0:
         title = 'light'
     else:
