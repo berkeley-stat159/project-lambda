@@ -26,6 +26,7 @@ preprocess:
 
 eda:
 	python code/stat159lambda/reproduction/inter_run_diagnostics.py
+	python code/stat159lambda/reproduction/brain_mask.py
 	python code/stat159lambda/simulations/correlation_simulation.py
 
 reproduction:
