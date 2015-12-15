@@ -16,7 +16,7 @@ verbose:
 
 
 data:
-	cd data && make data
+	cd data && make download-data
 
 validate-data:
 	cd data && make validate
