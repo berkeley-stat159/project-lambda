@@ -16,6 +16,19 @@ INTER_SUBJECT_SMOOTH_MM = 8
 
 
 def concatenate_runs(subj_num):
+    """
+    Concatenates data from all runs for a particular subject and saves that
+    data into a designated file. If file already exists, uses that cached file
+    instead.
+
+    Parameters
+    ----------
+    subj_num : int 
+
+    Returns
+    -------
+    None
+    """
     npy_file_name = dp.get_concatenated_path(subj_num)
     if not exists(npy_file_name) or not USE_CACHED_DATA:
         run_data = []
@@ -36,6 +49,20 @@ def concatenate_runs(subj_num):
 
 
 def reshape_smoothed_to_2d(subj_num, fwhm_mm):
+    """
+    Reshapes the original 4-D array data into a 2-D array of a given subject
+    and full width half maximum smoothed version and saves that into a
+    designated file. If file already exists, uses that cached file instead.
+
+    Parameters
+    ----------
+    subj_num : int
+    fwhm_mm : int
+
+    Returns
+    -------
+    None
+    """
     smoothed_path = dp.get_smoothed_path(subj_num, fwhm_mm)
     smoothed_path_2d = smoothed_path.replace('.npy', '_2d.npy')
     if not exists(smoothed_path_2d) or not USE_CACHED_DATA:
@@ -53,6 +80,18 @@ def reshape_smoothed_to_2d(subj_num, fwhm_mm):
 
 
 def get_affine():
+    """
+    Retrieves the absolute path to the affine.npy file and loads the data from
+    that file
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    affine_data : array
+    """
     affine_path = '{0}/data/affine.npy'.format(REPO_HOME_PATH)
     if not exists(affine_path):
         subj_num, run_num = 1, 1
@@ -64,6 +103,21 @@ def get_affine():
 
 
 def gaussian_smooth_subj(subj_num, fwhm_mm):
+    """
+    Retrieves the absolute path to the smoothed data for a particular subject
+    and full width half maximum smoothed version. Loads the data and saves it
+    in the retrieved path. If file already exists, then uses cached version
+    instead.
+
+    Parameters
+    ----------
+    subj_num : int
+    fwhm_mm : int
+
+    Returns 
+    -------
+    None
+    """
     smoothed_data_path = dp.get_smoothed_path(subj_num, fwhm_mm)
     if not exists(smoothed_data_path) or not USE_CACHED_DATA:
         data = np.load(dp.get_concatenated_path(subj_num)).astype(np.float32)
@@ -76,20 +130,65 @@ def gaussian_smooth_subj(subj_num, fwhm_mm):
 
 
 def apply_gaussian_smooth(data_4d, fwhm_mm):
+    """
+    Applies a Gaussian filter to the 4-D data
+
+    Parameters
+    ----------
+    data_4d : 4-D array
+    fwhm_mm : int
+
+    Returns
+    -------
+    gaussian_data : array
+    """
     sigma = np.hstack((convert_fwhm_mm_to_sd_voxel(fwhm_mm), 0))
     return filters.gaussian_filter(data_4d, sigma)
 
 
 def convert_fwhm_to_sigma(fwhm):
+    """
+    Converts the full width half maximum smoothed version to standard deviation
+
+    Parameters
+    ----------
+    fwhm : int
+
+    Returns
+    -------
+    sigma : float
+    """
     return fwhm / (2 * np.sqrt(2 * np.log(2)))
 
 
 def get_voxel_lengths(affine):
+    """
+    Computes vector norms along the 0th axis
+
+    Parameters
+    ----------
+    affine : array
+
+    Returns
+    -------
+    norms : array
+    """
     affine = affine[:3, :3]
     return np.linalg.norm(affine, axis=0)
 
 
 def convert_fwhm_mm_to_sd_voxel(fwhm):
+    """
+    Converts the full width half maximum measurement to standard deviation
+
+    Parameters
+    ----------
+    fwhm : int
+
+    Returns
+    -------
+    sd_voxel : float
+    """
     return convert_fwhm_to_sigma(fwhm) / get_voxel_lengths(get_affine())
 
 
