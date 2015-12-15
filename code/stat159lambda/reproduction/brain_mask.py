@@ -7,6 +7,18 @@ from os.path import exists
 
 
 def plot_vol_mean_histogram(subj_num):
+    """
+    Plots the mean volume for a particular subject and saves that histogram
+    into the figures folder
+
+    Parameters
+    ----------
+    subj_num : int
+
+    Returns
+    -------
+    None
+    """
     data = np.load(dp.get_concatenated_path(subj_num))[...,
                                                        NUM_OFFSET_VOLUMES:]
     mean_vol = np.mean(data, axis=-1)
@@ -18,6 +30,17 @@ def plot_vol_mean_histogram(subj_num):
 
 
 def get_brain_mask():
+    """
+    Retrieves the path to the brain mask and loads that data
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    brain_mask : array
+    """
     brain_mask_path = dp.get_brain_mask_path()
     if not exists(brain_mask_path):
         data = np.load(dp.get_concatenated_path(1))
@@ -28,6 +51,18 @@ def get_brain_mask():
 
 
 def plot_brain_mask(slice):
+    """
+    Plots the brain mask at a particular slice and saves that into the figures
+    folder
+
+    Parameters
+    ----------
+    slice : int
+
+    Returns
+    -------
+    None
+    """
     image = get_brain_mask()[:, :, slice]
     plt.imshow(image, cmap='gray')
     plot_path = '{0}/figures/brain_mask.png'.format(REPO_HOME_PATH)

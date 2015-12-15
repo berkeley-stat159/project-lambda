@@ -107,6 +107,17 @@ def get_2d_path(subj_num):
 
 
 def get_brain_mask_path():
+    """
+    Derives the absolute path to the brain_mask.npy file
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    path : string
+    """
     return '{0}/data/brain_mask.npy'.format(REPO_HOME_PATH)
 
 
@@ -128,4 +139,15 @@ def get_correlation_hist_path(aggregation):
 
 
 def get_scene_csv():
+    """
+    Derives the absolute path to the scenes.csv file
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    path : string
+    """
     return '{0}/data/scenes.csv'.format(REPO_HOME_PATH)
